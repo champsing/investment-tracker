@@ -53,7 +53,7 @@ pub fn verify(token: &str, now: u64) -> Option<UserGroup> {
         Some(token) => {
             let token: Token<Header, Claims, _> = token;
             let claims: &Claims = token.claims();
-            if claims.exp < now {
+            if claims.exp > now {
                 Some(claims.iss)
             } else {
                 None

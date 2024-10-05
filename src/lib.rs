@@ -1,3 +1,3 @@
-mod constant;
-mod error;
 pub mod auth;
+pub mod constant;
+mod error;

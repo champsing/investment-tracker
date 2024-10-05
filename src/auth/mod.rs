@@ -1,7 +1,7 @@
+pub mod check;
 mod database;
 pub mod insert;
 pub mod login;
-pub mod check;
 
 use serde::{Deserialize, Serialize};
 
