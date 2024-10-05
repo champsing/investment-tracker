@@ -1,0 +1,17 @@
+# Node.JS
+node_modules
+dist
+
+# Rust
+target
+
+# Runtime
+data
+
+# Editor directories and files
+.vscode/*
+.github/*
+.git/*
+.gitignore
+README.md
+.DS_Store

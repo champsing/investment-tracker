@@ -1,0 +1,17 @@
+{
+    "css.validate": false,
+    "tailwindCSS.includeLanguages": {
+        "vue": "html",
+        "vue-html": "html"
+    },
+    "editor.rulers": [
+        80
+    ],
+    "cSpell.words": [
+        "actix",
+        "composables",
+        "formatcp",
+        "Hmac",
+        "polodb"
+    ],
+}
