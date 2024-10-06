@@ -6,39 +6,38 @@ import {
     VaSidebarItem,
     VaSidebarItemContent,
     VaSidebarItemTitle,
-    VaIcon,
-    VaSpacer
+    VaIcon
 } from "vuestic-ui";
 import Login from './components/Login.vue';
 import axios from "axios";
 
-// theme
+// dark theme
 const { applyPreset, colors } = useColors();
-applyPreset('dark')
+applyPreset('dark');
 
-// token
+// auth token
 const auth = ref(false);
 function setToken(token: string) {
-    localStorage.setItem('token', token)
-    auth.value = true
+    localStorage.setItem('token', token);
+    auth.value = true;
 }
-function rotateToken() {
+function refreshToken() {
     let token = localStorage.getItem('token');
     if (token == null) {
         auth.value = false;
+    } else {
+        axios.post("/api/auth/refresh", {
+            token: token
+        }).then(response => {
+            setToken(response.data);
+        }).catch(_ => {
+            auth.value = false;
+        });
     }
-
-    axios.post("/api/auth/refresh", {
-        token: token
-    }).then(response => {
-        setToken(response.data);
-    }).catch(_ => {
-        auth.value = false;
-    });
 }
-rotateToken();
+refreshToken();
 setInterval(() => {
-    rotateToken();
+    refreshToken();
 }, 1000 * 60 * 10); // 10 minutes
 
 // sidebar
@@ -50,29 +49,24 @@ const minSidebar = ref(false)
         <template v-if="auth">
             <div class="flex">
                 <VaSidebar :minimized="minSidebar" minimized-width="64px" class="h-full min-h-screen">
-                    <div>
-                        <VaSidebarItem>
-                            <VaSidebarItemContent>
-                                <VaIcon name="ms-left_panel_close" />
-                                <VaSidebarItemTitle></VaSidebarItemTitle>
-                            </VaSidebarItemContent>
-                        </VaSidebarItem>
-                        <VaSidebarItem>
-                            <VaSidebarItemContent>
-                                <VaIcon name="ms-dashboard" />
-                                <VaSidebarItemTitle>Overview</VaSidebarItemTitle>
-                            </VaSidebarItemContent>
-                        </VaSidebarItem>
-                        <VaSidebarItem>
-                            <VaSidebarItemContent>
-                                <VaIcon name="ms-monitoring" />
-                                <VaSidebarItemTitle>Investments</VaSidebarItemTitle>
-                            </VaSidebarItemContent>
-                        </VaSidebarItem>
-                    </div>
-
-                    <VaSpacer />
-
+                    <VaSidebarItem>
+                        <VaSidebarItemContent>
+                            <VaIcon name="ms-left_panel_close" />
+                            <VaSidebarItemTitle></VaSidebarItemTitle>
+                        </VaSidebarItemContent>
+                    </VaSidebarItem>
+                    <VaSidebarItem>
+                        <VaSidebarItemContent>
+                            <VaIcon name="ms-dashboard" />
+                            <VaSidebarItemTitle>Overview</VaSidebarItemTitle>
+                        </VaSidebarItemContent>
+                    </VaSidebarItem>
+                    <VaSidebarItem>
+                        <VaSidebarItemContent>
+                            <VaIcon name="ms-monitoring" />
+                            <VaSidebarItemTitle>Investments</VaSidebarItemTitle>
+                        </VaSidebarItemContent>
+                    </VaSidebarItem>
                     <VaSidebarItem>
                         <VaSidebarItemContent>
                             <VaIcon name="ms-settings" />
@@ -81,9 +75,8 @@ const minSidebar = ref(false)
                     </VaSidebarItem>
                 </VaSidebar>
 
-                <div class="text-white text-lg"> Success </div>
+                <RouterView />
             </div>
-
         </template>
         <template v-else>
             <Login @token="(value) => setToken(value)" />
