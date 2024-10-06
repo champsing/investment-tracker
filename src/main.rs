@@ -1,4 +1,5 @@
 use actix_files::Files;
+use actix_web::web;
 use actix_web::{App, HttpServer};
 use server::auth;
 use server::constant;
@@ -19,6 +20,7 @@ async fn main() -> std::io::Result<()> {
             .service(auth::login)
             .service(auth::refresh)
             .service(Files::new("/", constant::path::WEB).index_file("index.html"))
+            .default_service(web::to(server::index))
     })
     .bind(("0.0.0.0", 8080))?
     .run()
