@@ -1,7 +1,5 @@
-pub mod check;
 mod database;
-pub mod insert;
-pub mod login;
+mod services;
 
 use serde::{Deserialize, Serialize};
 
@@ -11,4 +9,4 @@ pub enum UserGroup {
     Editor,
 }
 
-pub use login::verify;
+pub use services::*;

@@ -16,8 +16,8 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
-            .service(auth::login::handler)
-            .service(auth::check::handler)
+            .service(auth::login)
+            .service(auth::refresh)
             .service(Files::new("/", constant::path::WEB).index_file("index.html"))
     })
     .bind(("0.0.0.0", 8080))?

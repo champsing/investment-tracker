@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.card-size {
+    height: 300px;
+    width: 400px;
+}

@@ -9,9 +9,12 @@
     ],
     "cSpell.words": [
         "actix",
+        "axios",
         "composables",
         "formatcp",
         "Hmac",
-        "polodb"
+        "polodb",
+        "tailwindcss",
+        "vuestic"
     ],
 }
