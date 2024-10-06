@@ -49,33 +49,36 @@ const icon = computed(() => minimize.value ? 'ms-left_panel_open' : 'ms-left_pan
     <div class="background" :style="{ backgroundColor: colors.backgroundPrimary }">
         <template v-if="auth">
             <div class="flex">
-                <VaSidebar :minimized="minimize" minimized-width="64px" class="h-full min-h-screen">
-                    <VaSidebarItem @click="minimize = !minimize">
-                        <VaSidebarItemContent>
-                            <VaIcon :name="icon" />
-                        </VaSidebarItemContent>
-                    </VaSidebarItem>
-                    <VaSidebarItem>
-                        <VaSidebarItemContent>
-                            <VaIcon name="ms-dashboard" />
-                            <VaSidebarItemTitle>Overview</VaSidebarItemTitle>
-                        </VaSidebarItemContent>
-                    </VaSidebarItem>
-                    <VaSidebarItem>
-                        <VaSidebarItemContent>
-                            <VaIcon name="ms-monitoring" />
-                            <VaSidebarItemTitle>Investments</VaSidebarItemTitle>
-                        </VaSidebarItemContent>
-                    </VaSidebarItem>
-                    <VaSidebarItem>
-                        <VaSidebarItemContent>
-                            <VaIcon name="ms-settings" />
-                            <VaSidebarItemTitle>Settings</VaSidebarItemTitle>
-                        </VaSidebarItemContent>
-                    </VaSidebarItem>
-                </VaSidebar>
-
-                <RouterView />
+                <div class="flex-grow-0">
+                    <VaSidebar :minimized="minimize" minimized-width="64px" class="h-full min-h-screen">
+                        <VaSidebarItem @click="minimize = !minimize">
+                            <VaSidebarItemContent>
+                                <VaIcon :name="icon" />
+                            </VaSidebarItemContent>
+                        </VaSidebarItem>
+                        <VaSidebarItem to="/" :active="$route.path == '/'">
+                            <VaSidebarItemContent>
+                                <VaIcon name="ms-dashboard" />
+                                <VaSidebarItemTitle>Overview</VaSidebarItemTitle>
+                            </VaSidebarItemContent>
+                        </VaSidebarItem>
+                        <VaSidebarItem>
+                            <VaSidebarItemContent>
+                                <VaIcon name="ms-monitoring" />
+                                <VaSidebarItemTitle>Investments</VaSidebarItemTitle>
+                            </VaSidebarItemContent>
+                        </VaSidebarItem>
+                        <VaSidebarItem to="/settings" :active="$route.path == '/settings'">
+                            <VaSidebarItemContent>
+                                <VaIcon name="ms-settings" />
+                                <VaSidebarItemTitle>Settings</VaSidebarItemTitle>
+                            </VaSidebarItemContent>
+                        </VaSidebarItem>
+                    </VaSidebar>
+                </div>
+                <div class="p-4">
+                    <RouterView />
+                </div>
             </div>
         </template>
         <template v-else>
