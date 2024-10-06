@@ -35,8 +35,8 @@ function login() {
         <VaCard class="card-size flex items-center justify-evenly flex-col">
             <VaInput v-model="form.username" label="Username" name="Username" class="w-3/5" />
             <VaInput ref="input" v-model="form.password" label="Password" type="password" name="Password"
-                immediate-validation error-messages="Login failed" :error="failed" @input="failed = false"
-                class="w-3/5" @keyup.enter="login()"/>
+                immediate-validation error-messages="Login failed" :error="failed" @input="failed = false" class="w-3/5"
+                @keyup.enter="login()" />
             <VaButton @click="login()" :loading="loading" class="w-1/3"> Login </VaButton>
         </VaCard>
     </div>
