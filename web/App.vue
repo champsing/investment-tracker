@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue"
+import { computed, ref } from "vue"
 import {
     useColors,
     VaSidebar,
@@ -41,18 +41,18 @@ setInterval(() => {
 }, 1000 * 60 * 10); // 10 minutes
 
 // sidebar
-const minSidebar = ref(false)
+const minimize = ref(false);
+const icon = computed(() => minimize.value ? 'ms-left_panel_open' : 'ms-left_panel_close')
 </script>
 
 <template>
     <div class="background" :style="{ backgroundColor: colors.backgroundPrimary }">
         <template v-if="auth">
             <div class="flex">
-                <VaSidebar :minimized="minSidebar" minimized-width="64px" class="h-full min-h-screen">
-                    <VaSidebarItem>
+                <VaSidebar :minimized="minimize" minimized-width="64px" class="h-full min-h-screen">
+                    <VaSidebarItem @click="minimize = !minimize">
                         <VaSidebarItemContent>
-                            <VaIcon name="ms-left_panel_close" />
-                            <VaSidebarItemTitle></VaSidebarItemTitle>
+                            <VaIcon :name="icon" />
                         </VaSidebarItemContent>
                     </VaSidebarItem>
                     <VaSidebarItem>
