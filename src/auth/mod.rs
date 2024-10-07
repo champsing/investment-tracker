@@ -10,3 +10,4 @@ pub enum UserGroup {
 }
 
 pub use services::*;
+pub use database::init;

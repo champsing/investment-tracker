@@ -1,5 +1,6 @@
 use super::{database, UserGroup};
 use crate::error::Result;
+use actix_web::put;
 use actix_web::{post, web::Json, HttpResponse, Responder};
 use hmac::{Hmac, Mac};
 use jwt::{Header, SignWithKey, Token, VerifyWithKey};
@@ -25,7 +26,6 @@ struct Claims {
 
 pub fn verify_token(token: &str, now: u64) -> Option<UserGroup> {
     match token.verify_with_key(&*PRIVATE_KEY).ok() {
-        None => None,
         Some(token) => {
             let token: Token<Header, Claims, _> = token;
             let claims: &Claims = token.claims();
@@ -35,6 +35,7 @@ pub fn verify_token(token: &str, now: u64) -> Option<UserGroup> {
                 None
             }
         }
+        _ => None,
     }
 }
 
@@ -46,19 +47,18 @@ struct LoginRequest {
 
 #[post("/api/auth/login")]
 pub async fn login(request: Json<LoginRequest>) -> Result<impl Responder> {
-    let user_group = database::login(&request.username, &request.password)?;
-
-    if let Some(user_group) = user_group {
-        let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
-        let claims = Claims {
-            iss: user_group,
-            iat: now,
-            exp: now + 3600,
-        };
-        let token = claims.sign_with_key(&*PRIVATE_KEY)?;
-        Ok(HttpResponse::Ok().body(token))
-    } else {
-        Ok(HttpResponse::Forbidden().finish())
+    match database::login(&request.username, &request.password)? {
+        Some(user_group) => {
+            let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
+            let claims = Claims {
+                iss: user_group,
+                iat: now,
+                exp: now + 3600,
+            };
+            let token = claims.sign_with_key(&*PRIVATE_KEY)?;
+            Ok(HttpResponse::Ok().body(token))
+        }
+        _ => Ok(HttpResponse::Forbidden().finish()),
     }
 }
 
@@ -81,6 +81,28 @@ pub async fn refresh(request: Json<RefreshRequest>) -> Result<impl Responder> {
             let token = claims.sign_with_key(&*PRIVATE_KEY)?;
             Ok(HttpResponse::Ok().body(token))
         }
-        None => Ok(HttpResponse::Forbidden().finish()),
+        _ => Ok(HttpResponse::Forbidden().finish()),
+    }
+}
+
+#[derive(Debug, Deserialize)]
+struct InsertRequest {
+    token: String,
+    username: String,
+    password: String,
+    group: UserGroup,
+}
+
+#[put("/api/auth/insert")]
+pub async fn insert(request: Json<InsertRequest>) -> Result<impl Responder> {
+    let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
+
+    match verify_token(&request.token, now) {
+        Some(UserGroup::Editor) => {
+            database::insert(&request.username, &request.password, request.group)?;
+
+            Ok(HttpResponse::Ok().finish())
+        }
+        _ => Ok(HttpResponse::Forbidden().finish()),
     }
 }

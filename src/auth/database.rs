@@ -2,7 +2,7 @@ use super::UserGroup;
 use crate::constant::path;
 use crate::error::Result;
 use const_format::formatcp as const_format;
-use polodb_core::{bson::doc, CollectionT, Database};
+use polodb_core::{bson::doc, CollectionT, Database, IndexModel, IndexOptions};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
@@ -13,6 +13,22 @@ struct User {
     username: String,
     password: Vec<u8>,
     group: UserGroup,
+}
+
+pub fn init() -> Result<()> {
+    let database = Database::open_path(DATABASE)?;
+    let collection = database.collection::<User>("users");
+    collection.create_index(IndexModel {
+        keys: doc! {
+            "username": 1,
+        },
+        options: Some(IndexOptions {
+            name: Some(String::from("username_1")),
+            unique: Some(true),
+        }),
+    })?;
+
+    Ok(())
 }
 
 pub fn login(username: &str, password: &str) -> Result<Option<UserGroup>> {
@@ -42,16 +58,16 @@ pub fn login(username: &str, password: &str) -> Result<Option<UserGroup>> {
     return Ok(None);
 }
 
-pub fn contains(username: String) -> Result<bool> {
+pub fn insert(username: &str, password: &str, group: UserGroup) -> Result<()> {
     let database = Database::open_path(DATABASE)?;
     let collection = database.collection::<User>("users");
 
-    let count = collection
-        .find(doc! {
-            "username": username
-        })
-        .run()?
-        .count();
-
-    Ok(count != 0)
+    let password: Vec<_> = Sha256::digest(password).into_iter().collect();
+    collection.insert_one(User {
+        username: username.to_string(),
+        password: password,
+        group,
+    })?;
+    
+    Ok(())
 }
