@@ -32,12 +32,12 @@ function login() {
 
 <template>
     <div class="h-screen w-screen flex items-center justify-center">
-        <VaCard class="card-size flex items-center justify-evenly flex-col">
-            <VaInput v-model="form.username" label="Username" name="Username" class="w-3/5" />
+        <VaCard class="card-size flex flex-col flex-grow-0 items-center justify-evenly">
+            <VaInput v-model="form.username" label="Username" name="Username" class="w-3/5 flex-grow-0" />
             <VaInput ref="input" v-model="form.password" label="Password" type="password" name="Password"
-                immediate-validation error-messages="Login failed" :error="failed" @input="failed = false" class="w-3/5"
-                @keyup.enter="login()" />
-            <VaButton @click="login()" :loading="loading" class="w-1/3"> Login </VaButton>
+                immediate-validation error-messages="Login failed" :error="failed" @input="failed = false"
+                @keyup.enter="login()" class="w-3/5 flex-grow-0" />
+            <VaButton @click="login()" :loading="loading" class="w-1/3 flex-grow-0"> Login </VaButton>
         </VaCard>
     </div>
 </template>

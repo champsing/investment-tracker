@@ -82,7 +82,9 @@ const icon = computed(() => minimize.value ? 'ms-left_panel_open' : 'ms-left_pan
             </div>
         </template>
         <template v-else>
-            <Login @token="(value) => setToken(value)" />
+            <div>
+                <Login @token="(value) => setToken(value)" />
+            </div>
         </template>
     </div>
 </template>

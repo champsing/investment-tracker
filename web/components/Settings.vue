@@ -2,7 +2,7 @@
 </script>
 
 <template>
-    <h2 class="va-h2">Settings</h2>
+    <h3 class="va-h3">Users</h3>
 </template>
 
 <style scoped></style>
