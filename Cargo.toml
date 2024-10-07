@@ -13,6 +13,7 @@ rsa = "0.9"
 sha2 = "0.10"
 hmac = "0.12"
 jwt = "0.16"
+base64 = "0.22"
 polodb_core = "5.1"
 log = "0.4"
 derive_more = { version = "1.0", features = ["display", "from"] }

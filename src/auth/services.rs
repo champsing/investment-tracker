@@ -99,6 +99,47 @@ pub mod refresh {
     }
 }
 
+pub mod all_users {
+    use super::verify;
+    use crate::{
+        auth::{database, UserGroup},
+        error::Result,
+    };
+    use actix_web::{post, web, HttpResponse, Responder};
+    use serde::{Deserialize, Serialize};
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    #[derive(Debug, Deserialize)]
+    struct Request {
+        token: String,
+    }
+
+    #[derive(Debug, Serialize)]
+    struct User {
+        username: String,
+        group: UserGroup,
+    }
+
+    #[post("/api/auth/all_users")]
+    pub async fn handler(request: web::Json<Request>) -> Result<impl Responder> {
+        let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
+
+        match verify(&request.token, now) {
+            Some(UserGroup::Editor) => {
+                let users: Vec<_> = database::all()?
+                    .into_iter()
+                    .map(|u| User {
+                        username: u.0,
+                        group: u.1,
+                    })
+                    .collect();
+                Ok(HttpResponse::Ok().json(users))
+            }
+            _ => Ok(HttpResponse::Forbidden().finish()),
+        }
+    }
+}
+
 pub mod insert {
     use super::{database, verify, UserGroup};
     use crate::error::Result;
@@ -121,6 +162,34 @@ pub mod insert {
         match verify(&request.token, now) {
             Some(UserGroup::Editor) => {
                 database::insert(&request.username, &request.password, request.group)?;
+
+                Ok(HttpResponse::Ok().finish())
+            }
+            _ => Ok(HttpResponse::Forbidden().finish()),
+        }
+    }
+}
+
+pub mod delete {
+    use super::{database, verify, UserGroup};
+    use crate::error::Result;
+    use actix_web::{delete, web, HttpResponse, Responder};
+    use serde::Deserialize;
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    #[derive(Debug, Deserialize)]
+    struct Request {
+        token: String,
+        username: String,
+    }
+
+    #[delete("/api/auth/delete")]
+    pub async fn handler(request: web::Json<Request>) -> Result<impl Responder> {
+        let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
+
+        match verify(&request.token, now) {
+            Some(UserGroup::Editor) => {
+                database::delete(&request.username)?;
 
                 Ok(HttpResponse::Ok().finish())
             }

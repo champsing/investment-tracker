@@ -3,10 +3,11 @@ use derive_more::{Display, From};
 
 #[derive(Debug, Display, From)]
 pub enum ServerError {
-    Polodb(polodb_core::Error),
-    Jwt(jwt::Error),
     SystemTime(std::time::SystemTimeError),
     Io(std::io::Error),
+    Polodb(polodb_core::Error),
+    Bson(polodb_core::bson::ser::Error),
+    Jwt(jwt::Error),
 }
 
 impl ResponseError for ServerError {}

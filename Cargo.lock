@@ -1443,6 +1443,7 @@ version = "0.0.1"
 dependencies = [
  "actix-files",
  "actix-web",
+ "base64 0.22.1",
  "const_format",
  "derive_more 1.0.0",
  "hmac",
