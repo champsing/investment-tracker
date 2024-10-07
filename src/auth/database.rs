@@ -68,6 +68,6 @@ pub fn insert(username: &str, password: &str, group: UserGroup) -> Result<()> {
         password: password,
         group,
     })?;
-    
+
     Ok(())
 }

@@ -14,7 +14,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .service(auth::login)
             .service(auth::refresh)
-            .service(Files::new("/", constant::path::WEB).index_file("index.html"))
+            .service(Files::new("/", constant::path::STATIC).index_file("index.html"))
             .default_service(web::to(server::index))
     })
     .bind(("0.0.0.0", 8080))?

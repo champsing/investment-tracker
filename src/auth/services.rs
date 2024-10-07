@@ -1,14 +1,10 @@
 use super::{database, UserGroup};
-use crate::error::Result;
-use actix_web::put;
-use actix_web::{post, web::Json, HttpResponse, Responder};
 use hmac::{Hmac, Mac};
-use jwt::{Header, SignWithKey, Token, VerifyWithKey};
+use jwt::{Header, Token, VerifyWithKey};
 use rand::RngCore;
 use serde::{Deserialize, Serialize};
 use sha2::Sha256;
 use std::sync::LazyLock;
-use std::time::{SystemTime, UNIX_EPOCH};
 
 static PRIVATE_KEY: LazyLock<Hmac<Sha256>> = LazyLock::new(|| {
     let mut rng = rand::thread_rng();
@@ -24,7 +20,7 @@ struct Claims {
     exp: u64,
 }
 
-pub fn verify_token(token: &str, now: u64) -> Option<UserGroup> {
+pub fn verify(token: &str, now: u64) -> Option<UserGroup> {
     match token.verify_with_key(&*PRIVATE_KEY).ok() {
         Some(token) => {
             let token: Token<Header, Claims, _> = token;
@@ -39,70 +35,96 @@ pub fn verify_token(token: &str, now: u64) -> Option<UserGroup> {
     }
 }
 
-#[derive(Debug, Deserialize)]
-struct LoginRequest {
-    username: String,
-    password: String,
-}
+pub mod login {
+    use super::{database, Claims, PRIVATE_KEY};
+    use crate::error::Result;
+    use actix_web::{post, web, HttpResponse, Responder};
+    use jwt::SignWithKey;
+    use serde::Deserialize;
+    use std::time::{SystemTime, UNIX_EPOCH};
 
-#[post("/api/auth/login")]
-pub async fn login(request: Json<LoginRequest>) -> Result<impl Responder> {
-    match database::login(&request.username, &request.password)? {
-        Some(user_group) => {
-            let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
-            let claims = Claims {
-                iss: user_group,
-                iat: now,
-                exp: now + 3600,
-            };
-            let token = claims.sign_with_key(&*PRIVATE_KEY)?;
-            Ok(HttpResponse::Ok().body(token))
+    #[derive(Debug, Deserialize)]
+    struct Request {
+        username: String,
+        password: String,
+    }
+
+    #[post("/api/auth/login")]
+    pub async fn handler(request: web::Json<Request>) -> Result<impl Responder> {
+        match database::login(&request.username, &request.password)? {
+            Some(user_group) => {
+                let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
+                let claims = Claims {
+                    iss: user_group,
+                    iat: now,
+                    exp: now + 3600,
+                };
+                let token = claims.sign_with_key(&*PRIVATE_KEY)?;
+                Ok(HttpResponse::Ok().body(token))
+            }
+            _ => Ok(HttpResponse::Forbidden().finish()),
         }
-        _ => Ok(HttpResponse::Forbidden().finish()),
     }
 }
 
-#[derive(Debug, Deserialize)]
-struct RefreshRequest {
-    token: String,
-}
+pub mod refresh {
+    use super::{verify, Claims, PRIVATE_KEY};
+    use crate::error::Result;
+    use actix_web::{post, web, HttpResponse, Responder};
+    use jwt::SignWithKey;
+    use serde::Deserialize;
+    use std::time::{SystemTime, UNIX_EPOCH};
 
-#[post("/api/auth/refresh")]
-pub async fn refresh(request: Json<RefreshRequest>) -> Result<impl Responder> {
-    let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
+    #[derive(Debug, Deserialize)]
+    struct Request {
+        token: String,
+    }
 
-    match verify_token(&request.token, now) {
-        Some(user_group) => {
-            let claims = Claims {
-                iss: user_group,
-                iat: now,
-                exp: now + 3600,
-            };
-            let token = claims.sign_with_key(&*PRIVATE_KEY)?;
-            Ok(HttpResponse::Ok().body(token))
+    #[post("/api/auth/refresh")]
+    pub async fn handler(request: web::Json<Request>) -> Result<impl Responder> {
+        let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
+
+        match verify(&request.token, now) {
+            Some(user_group) => {
+                let claims = Claims {
+                    iss: user_group,
+                    iat: now,
+                    exp: now + 3600,
+                };
+                let token = claims.sign_with_key(&*PRIVATE_KEY)?;
+                Ok(HttpResponse::Ok().body(token))
+            }
+            _ => Ok(HttpResponse::Forbidden().finish()),
         }
-        _ => Ok(HttpResponse::Forbidden().finish()),
     }
 }
 
-#[derive(Debug, Deserialize)]
-struct InsertRequest {
-    token: String,
-    username: String,
-    password: String,
-    group: UserGroup,
-}
+pub mod insert {
+    use super::{database, verify, UserGroup};
+    use crate::error::Result;
+    use actix_web::{put, web, HttpResponse, Responder};
+    use serde::Deserialize;
+    use std::time::{SystemTime, UNIX_EPOCH};
 
-#[put("/api/auth/insert")]
-pub async fn insert(request: Json<InsertRequest>) -> Result<impl Responder> {
-    let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
+    #[derive(Debug, Deserialize)]
+    struct Request {
+        token: String,
+        username: String,
+        password: String,
+        group: UserGroup,
+    }
 
-    match verify_token(&request.token, now) {
-        Some(UserGroup::Editor) => {
-            database::insert(&request.username, &request.password, request.group)?;
+    #[put("/api/auth/insert")]
+    pub async fn handler(request: web::Json<Request>) -> Result<impl Responder> {
+        let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
 
-            Ok(HttpResponse::Ok().finish())
+        match verify(&request.token, now) {
+            Some(UserGroup::Editor) => {
+                database::insert(&request.username, &request.password, request.group)?;
+
+                Ok(HttpResponse::Ok().finish())
+            }
+            _ => Ok(HttpResponse::Forbidden().finish()),
         }
-        _ => Ok(HttpResponse::Forbidden().finish()),
     }
 }
