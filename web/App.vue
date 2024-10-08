@@ -98,6 +98,10 @@ const icon = computed(() => minimize.value ? 'ms-left_panel_open' : 'ms-left_pan
 }
 </style>
 <style lang="scss">
+:root {
+    color-scheme: dark;
+}
+
 .login-card {
     height: 300px;
     width: 400px;
@@ -107,9 +111,11 @@ const icon = computed(() => minimize.value ? 'ms-left_panel_open' : 'ms-left_pan
     width: 400px;
     --va-modal-dialog-height: 300px;
 }
+
 .va-modal__message {
     flex-grow: 1;
 }
+
 .va-modal__inner {
     height: 100%;
 }

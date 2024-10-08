@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref, reactive } from "vue"
+import { ref, reactive, Ref } from "vue"
 import axios from "axios";
-import { VaDataTable, VaButton } from 'vuestic-ui';
+import { VaDataTable, VaButton, VaDivider } from 'vuestic-ui';
+import { userGroup } from '@/composables/auth';
 
-const users = ref([])
-
+// fetch data
 function fetch() {
     axios.post("/api/auth/all_users", {
         token: localStorage.getItem('token')
@@ -13,68 +13,122 @@ function fetch() {
         users.value = response.data
     })
 }
-function show(username: string) {
-    modal.show = true
-    form.username = username
+
+// upsert
+function upsertModal(username: string) {
+    modal.upsert = true
+    upsertForm.username = username
     if (username == "") {
-        form.group = "Viewer"
+        modal.update = false
+        upsertForm.group = "Viewer"
     } else {
-        // TODO: based on `users`
+        modal.update = true
+        let user = users.value.filter(x => x.username == username)[0]
+        upsertForm.group = user.group
     }
 }
-function cancel() {
-    form.username = ""
-    form.password = ""
-    form.group = "Viewer"
+function upsert() {
+    if (upsertForm.username.length > 3 && upsertForm.password.length > 7) {
+        axios.post("/api/auth/upsert", {
+            token: localStorage.getItem('token'),
+            username: upsertForm.username,
+            password: upsertForm.password,
+            group: upsertForm.group,
+        }).then(_ => {
+            fetch()
+        })
+        clean()
+    } else {
+        modal.upsert = true
+    }
 }
-function submit() {
-    axios.put("/api/auth/insert", {
+function deleteModal(username: string) {
+    deleteForm.username = username
+    modal.delete = true
+}
+function remove() {
+    axios.post("/api/auth/delete", {
         token: localStorage.getItem('token'),
-        username: form.username,
-        password: form.password,
-        group: form.group,
+        username: deleteForm.username,
     }).then(_ => {
         fetch()
     })
-    cancel()
+    clean()
 }
-let modal = reactive({
-    show: false,
-})
-let form = reactive({
-    username: "",
-    password: "",
-    group: "",
-})
+function clean() {
+    upsertForm.username = ""
+    upsertForm.password = ""
+    upsertForm.group = "Viewer"
 
-fetch()
-
+    deleteForm.username = ""
+}
 function logout() {
     localStorage.removeItem('token');
     location.reload();
 }
+
+const users: Ref<{ username: string, group: string }[]> = ref([])
+const columns = [
+    { key: "username" },
+    { key: "group", label: "permission" },
+    { key: "username", name: "actions", label: "actions", width: 80 },
+]
+const modal = reactive({
+    upsert: false,
+    update: false,
+    delete: false,
+})
+const upsertForm = reactive({
+    username: "",
+    password: "",
+    group: "Viewer",
+})
+const deleteForm = reactive({
+    username: ""
+})
+
+fetch()
 </script>
 
 <template>
-    <div class="flex">
-        <div class="flex-grow-1 flex items-center justify-evenly">
-            <VaButton class="flex-grow-0 w-24" @click="show('')">Add Users</VaButton>
+    <template v-if="userGroup() == 'Editor'">
+        <div class="flex">
+            <div class="flex-grow-1 flex items-center justify-evenly">
+                <VaButton class="flex-grow-0 w-24" @click="upsertModal('')">Add Users</VaButton>
+                <VaButton class="flex-grow-0 w-24" @click="logout()">&nbsp;&nbsp;Logout&nbsp;</VaButton>
+            </div>
+            <div class="flex-grow-1">
+                <VaDataTable :items="users" :columns="columns" height="160px" sticky-header>
+                    <template #cell(actions)="{ value }">
+                        <VaButton preset="plain" icon="edit" @click="upsertModal(value)" />
+                        <VaButton preset="plain" icon="delete" class="ml-3" @click="deleteModal(value)" />
+                    </template>
+                </VaDataTable>
+            </div>
+        </div>
+        <VaModal v-model="modal.upsert" ok-text="Apply" @ok="upsert()" @cancel="clean()">
+            <div class="h-full flex flex-col items-center justify-evenly">
+                <VaInput v-model="upsertForm.username" label="Username" name="Username" :readonly="modal.update"
+                    :rules="[(i) => i.length > 3 || `username too short`]" class="w-3/5 flex-grow-0" />
+                <VaInput v-model="upsertForm.password" label="Password" type="password" name="Password"
+                    :rules="[(i) => i.length > 7 || `password too short`]" class="w-3/5 flex-grow-0" />
+                <VaSelect v-model="upsertForm.group" :options="['Viewer', 'Editor']" class="w-3/5 flex-grow-0" />
+            </div>
+        </VaModal>
+        <VaModal v-model="modal.delete" ok-text="Apply" @ok="remove()" @cancel="clean()">
+            <div class="h-full flex flex-col items-center justify-center">
+                <div class="flex-grow-0">
+                    Are you sure to delete user <span class="font-bold">{{ deleteForm.username }}</span>?
+                </div>
+            </div>
+        </VaModal>
+    </template>
+    <template v-else>
+        <div class="flex items-center justify-evenly">
             <VaButton class="flex-grow-0 w-24" @click="logout()">&nbsp;&nbsp;Logout&nbsp;</VaButton>
         </div>
-        <div class="flex-grow-1">
-            <VaDataTable :items="users">
-            </VaDataTable>
-        </div>
-    </div>
-    <VaModal v-model="modal.show" ok-text="Apply" @ok="submit()" @cancel="cancel()">
-        <div class="h-full flex flex-col items-center justify-evenly">
-            <VaInput v-model="form.username" label="Username" name="Username"
-                :rules="[(i) => i.length > 3 || `username too short`]" class="w-3/5 flex-grow-0" />
-            <VaInput v-model="form.password" label="Password" type="password" name="Password"
-                :rules="[(i) => i.length > 7 || `password too short`]" class="w-3/5 flex-grow-0" />
-            <VaSelect v-model="form.group" :options="['Viewer', 'Editor']" class="w-3/5 flex-grow-0" />
-        </div>
-    </VaModal>
+    </template>
+    <VaDivider />
 </template>
 
 <style scoped></style>

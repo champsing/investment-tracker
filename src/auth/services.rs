@@ -143,7 +143,7 @@ pub mod all_users {
 pub mod upsert {
     use super::{database, verify, UserGroup};
     use crate::error::Result;
-    use actix_web::{put, web, HttpResponse, Responder};
+    use actix_web::{post, web, HttpResponse, Responder};
     use serde::Deserialize;
     use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -155,15 +155,18 @@ pub mod upsert {
         group: UserGroup,
     }
 
-    #[put("/api/auth/upsert")]
+    #[post("/api/auth/upsert")]
     pub async fn handler(request: web::Json<Request>) -> Result<impl Responder> {
         let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
 
         match verify(&request.token, now) {
             Some(UserGroup::Editor) => {
-                database::upsert(&request.username, &request.password, request.group)?;
-
-                Ok(HttpResponse::Ok().finish())
+                if request.username.len() > 3 && request.password.len() > 7 {
+                    database::upsert(&request.username, &request.password, request.group)?;
+                    Ok(HttpResponse::Ok().finish())
+                } else {
+                    Ok(HttpResponse::BadRequest().finish())
+                }
             }
             _ => Ok(HttpResponse::Forbidden().finish()),
         }
@@ -173,7 +176,7 @@ pub mod upsert {
 pub mod delete {
     use super::{database, verify, UserGroup};
     use crate::error::Result;
-    use actix_web::{delete, web, HttpResponse, Responder};
+    use actix_web::{post, web, HttpResponse, Responder};
     use serde::Deserialize;
     use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -183,7 +186,7 @@ pub mod delete {
         username: String,
     }
 
-    #[delete("/api/auth/delete")]
+    #[post("/api/auth/delete")]
     pub async fn handler(request: web::Json<Request>) -> Result<impl Responder> {
         let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
 
