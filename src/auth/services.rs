@@ -140,7 +140,7 @@ pub mod all_users {
     }
 }
 
-pub mod insert {
+pub mod upsert {
     use super::{database, verify, UserGroup};
     use crate::error::Result;
     use actix_web::{put, web, HttpResponse, Responder};
@@ -155,13 +155,13 @@ pub mod insert {
         group: UserGroup,
     }
 
-    #[put("/api/auth/insert")]
+    #[put("/api/auth/upsert")]
     pub async fn handler(request: web::Json<Request>) -> Result<impl Responder> {
         let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
 
         match verify(&request.token, now) {
             Some(UserGroup::Editor) => {
-                database::insert(&request.username, &request.password, request.group)?;
+                database::upsert(&request.username, &request.password, request.group)?;
 
                 Ok(HttpResponse::Ok().finish())
             }

@@ -2,7 +2,7 @@ use super::UserGroup;
 use crate::constant::path;
 use crate::error::Result;
 use const_format::formatcp as const_format;
-use polodb_core::{bson, CollectionT, Database, IndexModel, IndexOptions};
+use polodb_core::{bson, options::UpdateOptions, CollectionT, Database, IndexModel, IndexOptions};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
@@ -24,7 +24,7 @@ pub fn init() -> Result<()> {
         },
         options: Some(IndexOptions {
             name: Some(String::from("username_1")),
-            unique: Some(true),
+            unique: Some(false),
         }),
     })?;
 
@@ -76,39 +76,23 @@ pub fn all() -> Result<Vec<(String, UserGroup)>> {
     Ok(users?)
 }
 
-pub fn insert(username: &str, password: &str, group: UserGroup) -> Result<()> {
+pub fn upsert(username: &str, password: &str, group: UserGroup) -> Result<()> {
     let database = Database::open_path(DATABASE)?;
-    let transition = database.start_transaction()?;
-    let collection = transition.collection::<User>("users");
-
-    let count = collection
-        .find(bson::doc! {
-            "username": username
-        })
-        .run()?
-        .count();
+    let collection = database.collection::<User>("users");
 
     let password = Sha256::digest(password).to_vec();
-    if count == 0 {
-        collection.insert_one(User {
-            username: String::from(username),
-            password,
-            group,
-        })?;
-    } else {
-        collection.update_one(
-            bson::doc! {
-                "username": username
+    collection.update_one_with_options(
+        bson::doc! {
+            "username": username
+        },
+        bson::doc! {
+            "$set": bson::doc! {
+                "password": bson::to_bson(&password)?,
+                "group": bson::to_bson(&group)?
             },
-            bson::doc! {
-                "$set": bson::doc! {
-                    "password": bson::to_bson(&password)?,
-                    "group": bson::to_bson(&group)?
-                },
-            },
-        )?;
-    }
-    transition.commit()?;
+        },
+        UpdateOptions { upsert: Some(true) },
+    )?;
 
     Ok(())
 }

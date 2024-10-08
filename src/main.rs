@@ -15,7 +15,7 @@ async fn main() -> std::io::Result<()> {
             .service(auth::login)
             .service(auth::refresh)
             .service(auth::all_users)
-            .service(auth::insert)
+            .service(auth::upsert)
             .service(auth::delete)
             .service(Files::new("/", constant::path::STATIC).index_file("index.html"))
             .default_service(web::to(server::index))
