@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, reactive, Ref } from "vue"
 import axios from "axios";
-import { VaDataTable, VaButton, VaDivider } from 'vuestic-ui';
+import { VaDataTable, VaButton } from 'vuestic-ui';
 import { userGroup } from '@/composables/auth';
 
 // fetch data
@@ -91,44 +91,46 @@ fetch()
 </script>
 
 <template>
-    <template v-if="userGroup() == 'Editor'">
-        <div class="flex">
-            <div class="flex-grow-1 flex items-center justify-evenly">
-                <VaButton class="flex-grow-0 w-24" @click="upsertModal('')">Add Users</VaButton>
+    <VaCard>
+        <VaCardTitle>Users</VaCardTitle>
+        <template v-if="userGroup() == 'Editor'">
+            <VaCardBlock horizontal>
+                <VaCardBlock class="flex-auto flex items-center justify-evenly">
+                    <VaButton class="flex-grow-0 w-24" @click="upsertModal('')">Add Users</VaButton>
+                    <VaButton class="flex-grow-0 w-24" @click="logout()">&nbsp;&nbsp;Logout&nbsp;</VaButton>
+                </VaCardBlock>
+                <VaCardBlock class="flex-auto">
+                    <VaDataTable :items="users" :columns="columns" height="160px" sticky-header>
+                        <template #cell(actions)="{ value }">
+                            <VaButton preset="plain" icon="edit" @click="upsertModal(value)" />
+                            <VaButton preset="plain" icon="delete" class="ml-3" @click="deleteModal(value)" />
+                        </template>
+                    </VaDataTable>
+                </VaCardBlock>
+            </VaCardBlock>
+        </template>
+        <template v-else>
+            <VaCardContent>
                 <VaButton class="flex-grow-0 w-24" @click="logout()">&nbsp;&nbsp;Logout&nbsp;</VaButton>
-            </div>
-            <div class="flex-grow-1">
-                <VaDataTable :items="users" :columns="columns" height="160px" sticky-header>
-                    <template #cell(actions)="{ value }">
-                        <VaButton preset="plain" icon="edit" @click="upsertModal(value)" />
-                        <VaButton preset="plain" icon="delete" class="ml-3" @click="deleteModal(value)" />
-                    </template>
-                </VaDataTable>
+            </VaCardContent>
+        </template>
+    </VaCard>
+    <VaModal v-model="modal.upsert" ok-text="Apply" @ok="upsert()" @cancel="clean()">
+        <div class="h-full flex flex-col items-center justify-evenly">
+            <VaInput v-model="upsertForm.username" label="Username" name="Username" :readonly="modal.update"
+                :rules="[(i) => i.length > 3 || `username too short`]" class="w-3/5 flex-grow-0" />
+            <VaInput v-model="upsertForm.password" label="Password" type="password" name="Password"
+                :rules="[(i) => i.length > 7 || `password too short`]" class="w-3/5 flex-grow-0" />
+            <VaSelect v-model="upsertForm.group" :options="['Viewer', 'Editor']" class="w-3/5 flex-grow-0" />
+        </div>
+    </VaModal>
+    <VaModal v-model="modal.delete" ok-text="Apply" @ok="remove()" @cancel="clean()">
+        <div class="h-full flex flex-col items-center justify-center">
+            <div class="flex-grow-0">
+                Are you sure to delete user <span class="font-bold">{{ deleteForm.username }}</span>?
             </div>
         </div>
-        <VaModal v-model="modal.upsert" ok-text="Apply" @ok="upsert()" @cancel="clean()">
-            <div class="h-full flex flex-col items-center justify-evenly">
-                <VaInput v-model="upsertForm.username" label="Username" name="Username" :readonly="modal.update"
-                    :rules="[(i) => i.length > 3 || `username too short`]" class="w-3/5 flex-grow-0" />
-                <VaInput v-model="upsertForm.password" label="Password" type="password" name="Password"
-                    :rules="[(i) => i.length > 7 || `password too short`]" class="w-3/5 flex-grow-0" />
-                <VaSelect v-model="upsertForm.group" :options="['Viewer', 'Editor']" class="w-3/5 flex-grow-0" />
-            </div>
-        </VaModal>
-        <VaModal v-model="modal.delete" ok-text="Apply" @ok="remove()" @cancel="clean()">
-            <div class="h-full flex flex-col items-center justify-center">
-                <div class="flex-grow-0">
-                    Are you sure to delete user <span class="font-bold">{{ deleteForm.username }}</span>?
-                </div>
-            </div>
-        </VaModal>
-    </template>
-    <template v-else>
-        <div class="flex items-center justify-evenly">
-            <VaButton class="flex-grow-0 w-24" @click="logout()">&nbsp;&nbsp;Logout&nbsp;</VaButton>
-        </div>
-    </template>
-    <VaDivider />
+    </VaModal>
 </template>
 
 <style scoped></style>
