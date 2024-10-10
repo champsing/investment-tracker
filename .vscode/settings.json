@@ -13,6 +13,7 @@
         "bson",
         "chrono",
         "composables",
+        "FHSA",
         "formatcp",
         "Hmac",
         "materialdesignicons",

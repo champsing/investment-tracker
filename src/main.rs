@@ -1,7 +1,7 @@
 use actix_files::Files;
 use actix_web::web;
 use actix_web::{App, HttpServer};
-use server::{constant, transaction, auth};
+use server::{auth, constant, investment};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -16,7 +16,9 @@ async fn main() -> std::io::Result<()> {
             .service(auth::all_users)
             .service(auth::upsert)
             .service(auth::delete)
-            .service(transaction::search)
+            .service(investment::account::query)
+            .service(investment::account::upsert)
+            .service(investment::account::delete)
             .service(Files::new("/", constant::path::STATIC).index_file("index.html"))
             .default_service(web::to(server::index))
     })
