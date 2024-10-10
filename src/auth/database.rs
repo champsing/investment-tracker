@@ -1,12 +1,10 @@
-use super::UserGroup;
-use crate::constant::path;
+use super::{UserGroup, CREDENTIAL_DATABASE};
 use crate::error::Result;
-use const_format::formatcp as const_format;
 use polodb_core::{bson, options::UpdateOptions, CollectionT, Database, IndexModel, IndexOptions};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
-const DATABASE: &str = const_format!("{}/credential.db", path::DATA);
+const USER_COLLECTION: &str = "users";
 
 #[derive(Debug, Serialize, Deserialize)]
 struct User {
@@ -16,8 +14,8 @@ struct User {
 }
 
 pub fn init() -> Result<()> {
-    let database = Database::open_path(DATABASE)?;
-    let collection = database.collection::<User>("users");
+    let database = Database::open_path(CREDENTIAL_DATABASE)?;
+    let collection = database.collection::<User>(USER_COLLECTION);
     collection.create_index(IndexModel {
         keys: bson::doc! {
             "username": 1,
@@ -32,8 +30,8 @@ pub fn init() -> Result<()> {
 }
 
 pub fn login(username: &str, password: &str) -> Result<Option<UserGroup>> {
-    let database = Database::open_path(DATABASE)?;
-    let collection = database.collection::<User>("users");
+    let database = Database::open_path(CREDENTIAL_DATABASE)?;
+    let collection = database.collection::<User>(USER_COLLECTION);
 
     let count = collection
         .find(bson::doc! {
@@ -64,8 +62,8 @@ pub fn login(username: &str, password: &str) -> Result<Option<UserGroup>> {
 }
 
 pub fn all() -> Result<Vec<(String, UserGroup)>> {
-    let database = Database::open_path(DATABASE)?;
-    let collection = database.collection::<User>("users");
+    let database = Database::open_path(CREDENTIAL_DATABASE)?;
+    let collection = database.collection::<User>(USER_COLLECTION);
 
     let users: std::result::Result<Vec<_>, _> = collection
         .find(bson::doc! {})
@@ -77,8 +75,8 @@ pub fn all() -> Result<Vec<(String, UserGroup)>> {
 }
 
 pub fn upsert(username: &str, password: &str, group: UserGroup) -> Result<()> {
-    let database = Database::open_path(DATABASE)?;
-    let collection = database.collection::<User>("users");
+    let database = Database::open_path(CREDENTIAL_DATABASE)?;
+    let collection = database.collection::<User>(USER_COLLECTION);
 
     let password = Sha256::digest(password).to_vec();
     collection.update_one_with_options(
@@ -98,8 +96,8 @@ pub fn upsert(username: &str, password: &str, group: UserGroup) -> Result<()> {
 }
 
 pub fn delete(username: &str) -> Result<()> {
-    let database = Database::open_path(DATABASE)?;
-    let collection = database.collection::<User>("users");
+    let database = Database::open_path(CREDENTIAL_DATABASE)?;
+    let collection = database.collection::<User>(USER_COLLECTION);
 
     collection.delete_one(bson::doc! {
         "username": String::from(username)
