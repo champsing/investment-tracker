@@ -1,6 +1,6 @@
 use super::{Account, INVESTMENT_DATABASE};
 use crate::error::Result;
-use polodb_core::{bson, options::UpdateOptions, CollectionT, Database, IndexModel, IndexOptions};
+use polodb_core::{bson, options::UpdateOptions, CollectionT, Database, IndexModel};
 
 const ACCOUNT_COLLECTION: &str = "accounts";
 
