@@ -1,6 +1,6 @@
 use super::{UserGroup, CREDENTIAL_DATABASE};
 use crate::error::Result;
-use polodb_core::{bson, options::UpdateOptions, CollectionT, Database, IndexModel, IndexOptions};
+use polodb_core::{bson, options::UpdateOptions, CollectionT, Database, IndexModel};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
@@ -20,10 +20,7 @@ pub fn init() -> Result<()> {
         keys: bson::doc! {
             "username": 1,
         },
-        options: Some(IndexOptions {
-            name: Some(String::from("username_1")),
-            unique: Some(false),
-        }),
+        options: None,
     })?;
 
     Ok(())
