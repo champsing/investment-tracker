@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, Ref } from "vue"
+import { ref, reactive } from "vue"
 import axios from "axios";
 import { VaDataTable, VaButton } from 'vuestic-ui';
 import { userGroup } from '@/composables/auth';
@@ -67,7 +67,7 @@ function logout() {
     location.reload();
 }
 
-const users: Ref<{ username: string, group: string }[]> = ref([])
+const users = ref<{ username: string, group: string }[]>([])
 const columns = [
     { key: "username" },
     { key: "group", label: "permission" },
