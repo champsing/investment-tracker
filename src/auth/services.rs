@@ -126,7 +126,7 @@ pub mod all_users {
 
         match verify(&request.token, now) {
             Some(UserGroup::Editor) => {
-                let users: Vec<_> = database::all()?
+                let users: Vec<_> = database::query()?
                     .into_iter()
                     .map(|u| User {
                         username: u.0,

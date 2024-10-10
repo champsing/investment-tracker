@@ -61,7 +61,7 @@ pub fn login(username: &str, password: &str) -> Result<Option<UserGroup>> {
     return Ok(None);
 }
 
-pub fn all() -> Result<Vec<(String, UserGroup)>> {
+pub fn query() -> Result<Vec<(String, UserGroup)>> {
     let database = Database::open_path(CREDENTIAL_DATABASE)?;
     let collection = database.collection::<User>(USER_COLLECTION);
 
