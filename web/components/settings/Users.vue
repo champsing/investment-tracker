@@ -17,23 +17,23 @@ function fetch() {
 // upsert
 function upsertModal(username: string) {
     modal.upsert = true
-    upsertForm.username = username
+    modalForm.username = username
     if (username == "") {
         modal.update = false
-        upsertForm.group = "Viewer"
+        modalForm.group = "Viewer"
     } else {
         modal.update = true
         let user = users.value.filter(x => x.username == username)[0]
-        upsertForm.group = user.group
+        modalForm.group = user.group
     }
 }
 function upsert() {
-    if (upsertForm.username.length > 3 && upsertForm.password.length > 7) {
+    if (modalForm.username.length > 3 && modalForm.password.length > 7) {
         axios.post("/api/auth/upsert", {
             token: localStorage.getItem('token'),
-            username: upsertForm.username,
-            password: upsertForm.password,
-            group: upsertForm.group,
+            username: modalForm.username,
+            password: modalForm.password,
+            group: modalForm.group,
         }).then(_ => {
             fetch()
         })
@@ -42,25 +42,25 @@ function upsert() {
         modal.upsert = true
     }
 }
-function deleteModal(username: string) {
-    deleteForm.username = username
+// remove
+function removeModal(username: string) {
+    modalForm.username = username
     modal.delete = true
 }
 function remove() {
     axios.post("/api/auth/delete", {
         token: localStorage.getItem('token'),
-        username: deleteForm.username,
+        username: modalForm.username,
     }).then(_ => {
         fetch()
     })
     clean()
 }
+// clean
 function clean() {
-    upsertForm.username = ""
-    upsertForm.password = ""
-    upsertForm.group = "Viewer"
-
-    deleteForm.username = ""
+    modalForm.username = ""
+    modalForm.password = ""
+    modalForm.group = "Viewer"
 }
 function logout() {
     localStorage.removeItem('token');
@@ -78,13 +78,10 @@ const modal = reactive({
     update: false,
     delete: false,
 })
-const upsertForm = reactive({
+const modalForm = reactive({
     username: "",
     password: "",
     group: "Viewer",
-})
-const deleteForm = reactive({
-    username: ""
 })
 
 fetch()
@@ -103,7 +100,7 @@ fetch()
                     <VaDataTable :items="users" :columns="columns" height="160px" sticky-header>
                         <template #cell(actions)="{ value }">
                             <VaButton preset="plain" icon="edit" @click="upsertModal(value)" />
-                            <VaButton preset="plain" icon="delete" class="ml-3" @click="deleteModal(value)" />
+                            <VaButton preset="plain" icon="delete" class="ml-3" @click="removeModal(value)" />
                         </template>
                     </VaDataTable>
                 </VaCardBlock>
@@ -117,17 +114,17 @@ fetch()
     </VaCard>
     <VaModal v-model="modal.upsert" ok-text="Apply" @ok="upsert()" @cancel="clean()">
         <div class="h-full flex flex-col items-center justify-evenly">
-            <VaInput v-model="upsertForm.username" label="Username" name="Username" :readonly="modal.update"
+            <VaInput v-model="modalForm.username" label="Username" name="Username" :readonly="modal.update"
                 :rules="[(i) => i.length > 3 || `username too short`]" class="w-3/5 flex-grow-0" />
-            <VaInput v-model="upsertForm.password" label="Password" type="password" name="Password"
+            <VaInput v-model="modalForm.password" label="Password" type="password" name="Password"
                 :rules="[(i) => i.length > 7 || `password too short`]" class="w-3/5 flex-grow-0" />
-            <VaSelect v-model="upsertForm.group" :options="['Viewer', 'Editor']" class="w-3/5 flex-grow-0" />
+            <VaSelect v-model="modalForm.group" :options="['Viewer', 'Editor']" class="w-3/5 flex-grow-0" />
         </div>
     </VaModal>
     <VaModal v-model="modal.delete" ok-text="Apply" @ok="remove()" @cancel="clean()">
         <div class="h-full flex flex-col items-center justify-center">
             <div class="flex-grow-0">
-                Are you sure to delete user <span class="font-bold">{{ deleteForm.username }}</span>?
+                Are you sure to delete user <span class="font-bold">{{ modalForm.username }}</span>?
             </div>
         </div>
     </VaModal>
