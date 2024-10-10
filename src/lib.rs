@@ -1,6 +1,8 @@
 pub mod auth;
 pub mod constant;
+pub mod transaction;
 mod error;
+mod account;
 
 use actix_files::NamedFile;
 use actix_web::Responder;
@@ -14,6 +16,7 @@ pub fn init() -> Result<()> {
     fs::create_dir_all(constant::path::STATIC)?;
 
     auth::init()?;
+    transaction::init()?;
 
     Ok(())
 }

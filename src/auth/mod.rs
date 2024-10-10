@@ -10,6 +10,7 @@ pub enum UserGroup {
 }
 
 pub use database::init;
+pub use services::verify;
 pub use services::all_users::handler as all_users;
 pub use services::delete::handler as delete;
 pub use services::login::handler as login;
