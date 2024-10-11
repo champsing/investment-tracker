@@ -62,7 +62,7 @@ const icon = computed(() => minimize.value ? 'ms-left_panel_open' : 'ms-left_pan
                                 <VaSidebarItemTitle>Overview</VaSidebarItemTitle>
                             </VaSidebarItemContent>
                         </VaSidebarItem>
-                        <VaSidebarItem>
+                        <VaSidebarItem to="/investments" :active="$route.path == '/investments'">
                             <VaSidebarItemContent>
                                 <VaIcon name="ms-monitoring" />
                                 <VaSidebarItemTitle>Investments</VaSidebarItemTitle>

@@ -4,6 +4,8 @@ import axios from "axios";
 import { VaDataTable, VaButton } from 'vuestic-ui';
 import { userGroup } from '@/composables/auth';
 
+interface User { username: string, group: string }
+
 // fetch data
 function fetch() {
     axios.post("/api/auth/all_users", {
@@ -67,7 +69,7 @@ function logout() {
     location.reload();
 }
 
-const users = ref<{ username: string, group: string }[]>([])
+const users = ref<User[]>([])
 const columns = [
     { key: "username" },
     { key: "group", label: "permission" },
