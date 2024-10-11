@@ -24,6 +24,7 @@ function upsertModal(id: string) {
     } else {
         modal.update = true
         let account = accounts.value.filter(x => x.id == id)[0]
+        modalForm.alias = account.alias
         modalForm.tag = account.tag
     }
 }
@@ -52,15 +53,15 @@ function removeModal(id: string) {
     modalForm.id = id
     modal.delete = true
 }
-// function remove() {
-//     axios.post("/api/investment/account/delete", {
-//         token: localStorage.getItem('token'),
-//         id: modalForm.id,
-//     }).then(_ => {
-//         fetch()
-//     })
-//     clean()
-// }
+function remove() {
+    axios.post("/api/investment/account/delete", {
+        token: localStorage.getItem('token'),
+        id: modalForm.id,
+    }).then(_ => {
+        fetch()
+    })
+    clean()
+}
 function clean() {
     modalForm.id = ""
     modalForm.alias = ""
@@ -97,7 +98,7 @@ fetch()
     </div>
     <VaDivider />
     <div class="flex flex-col">
-        <VaButton @click="upsertModal('')">Add</VaButton>
+        <VaButton @click="upsertModal('')">Add Account</VaButton>
         <VaAccordion>
             <VaCollapse v-for="(account, i) in accounts" :key="i">
                 <template #header="{ value, attrs, iconAttrs }">
@@ -120,6 +121,11 @@ fetch()
                             class="ml-3 flex-grow-0" />
                     </div>
                 </template>
+                <template #body>
+                    <div>
+                        Lorem ipsum dolor sit amet, consectetur adipisci
+                    </div>
+                </template>
             </VaCollapse>
         </VaAccordion>
     </div>
@@ -130,6 +136,15 @@ fetch()
             <VaInput v-model="modalForm.alias" label="Alias Name" name="Alias Name" class="w-3/5 flex-grow-0" />
             <VaSelect v-model="modalForm.tag" label="Account Type" :options="tagOptions" searchable
                 highlight-matched-text class="flex-grow-0 w-3/5" />
+        </div>
+    </VaModal>
+    <VaModal v-model="modal.delete" ok-text="Apply" @ok="remove()" @cancel="clean()">
+        <div class="h-full flex flex-col items-center justify-center">
+            <div class="flex-grow-0">
+                Are you sure to delete account <span class="font-bold">{{ modalForm.id == modalForm.alias ? modalForm.id
+                    :
+                    modalForm.alias + "(" + modalForm.id + ")" }}</span>?
+            </div>
         </div>
     </VaModal>
 </template>
