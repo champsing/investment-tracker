@@ -1,1 +1,4 @@
-CREATE TABLE IF NOT EXISTS `Configs` (`key` TEXT PRIMARY KEY, `value` TEXT);
+CREATE TABLE IF NOT EXISTS `Configs` (
+    `key` TEXT PRIMARY KEY NOT NULL,
+    `value` TEXT NOT NULL
+);
