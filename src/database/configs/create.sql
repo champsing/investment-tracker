@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS `Configs` (`key` TEXT PRIMARY KEY, `value` TEXT);

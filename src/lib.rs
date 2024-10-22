@@ -1,27 +1,29 @@
-pub mod auth;
-pub mod constant;
+mod database;
 mod error;
-pub mod investment;
-pub mod transaction;
+
+// pub mod auth;
+// pub mod investment;
+// pub mod transaction;
 
 use actix_files::NamedFile;
 use actix_web::Responder;
-use const_format::formatcp as const_format;
-pub use error::Result;
+use error::ServerError;
 use std::fs;
 
-pub fn init() -> Result<()> {
-    fs::create_dir_all(constant::path::CACHE)?;
-    fs::create_dir_all(constant::path::DATA)?;
-    fs::create_dir_all(constant::path::STATIC)?;
+pub fn init() -> Result<(), ServerError> {
+    fs::create_dir_all("data/")?;
+    fs::create_dir_all("dist/")?;
 
-    auth::init()?;
-    transaction::init()?;
+    database::init()?;
+
+    // auth::init()?;
+    // transaction::init()?;
 
     Ok(())
 }
 
-pub async fn index() -> Result<impl Responder> {
-    const INDEX: &str = const_format!("{}/index.html", constant::path::STATIC);
-    NamedFile::open_async(INDEX).await.map_err(|e| e.into())
+pub async fn index() -> Result<impl Responder, ServerError> {
+    NamedFile::open_async("dist/index.html")
+        .await
+        .map_err(|e| e.into())
 }
