@@ -1,5 +1,6 @@
 {
     "css.validate": false,
+    "files.eol": "\n",
     "tailwindCSS.includeLanguages": {
         "vue": "html",
         "vue-html": "html"
@@ -7,6 +8,15 @@
     "editor.rulers": [
         80
     ],
+    "SQL-Formatter-VSCode.dialect": "sqlite",
+    "SQL-Formatter-VSCode.dataTypeCase": "upper",
+    "SQL-Formatter-VSCode.functionCase": "upper",
+    "SQL-Formatter-VSCode.keywordCase": "upper",
+    "SQL-Formatter-VSCode.paramTypes": {
+        "numbered": [
+            "?"
+        ]
+    },
     "cSpell.words": [
         "actix",
         "axios",
@@ -19,6 +29,7 @@
         "materialdesignicons",
         "polodb",
         "RRSP",
+        "rusqlite",
         "tailwindcss",
         "TFSA",
         "vuestic"

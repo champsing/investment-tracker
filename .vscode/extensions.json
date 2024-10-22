@@ -3,6 +3,7 @@
         "Vue.volar",
         "Vue.vscode-typescript-vue-plugin",
         "bradlc.vscode-tailwindcss",
-        "rust-lang.rust-analyzer"
+        "rust-lang.rust-analyzer",
+        "ReneSaarsoo.sql-formatter-vsc"
     ]
 }
