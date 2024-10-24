@@ -1,4 +1,4 @@
-mod data;
+mod database;
 mod error;
 
 // pub mod auth;
@@ -10,7 +10,7 @@ use actix_web::Responder;
 use error::ServerError;
 
 pub fn init() -> Result<(), ServerError> {
-    data::init()?;
+    database::init()?;
     Ok(())
 }
 
