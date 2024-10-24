@@ -1,4 +1,4 @@
-mod database;
+mod data;
 mod error;
 
 // pub mod auth;
@@ -8,17 +8,9 @@ mod error;
 use actix_files::NamedFile;
 use actix_web::Responder;
 use error::ServerError;
-use std::fs;
 
 pub fn init() -> Result<(), ServerError> {
-    fs::create_dir_all("data/")?;
-    fs::create_dir_all("dist/")?;
-
-    database::init()?;
-
-    // auth::init()?;
-    // transaction::init()?;
-
+    data::init()?;
     Ok(())
 }
 

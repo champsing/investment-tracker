@@ -5,11 +5,11 @@ use derive_more::{Display, From};
 pub enum ServerError {
     Time(std::time::SystemTimeError),
     Io(std::io::Error),
-    ParseInt(core::num::ParseIntError),
     Sqlite(rusqlite::Error),
-    Polodb(polodb_core::Error),
-    Bson(polodb_core::bson::ser::Error),
+    Json(serde_json::Error),
     Jwt(jwt::Error),
+    #[from(skip)]
+    Internal(String),
 }
 
 impl ResponseError for ServerError {}

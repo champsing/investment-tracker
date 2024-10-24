@@ -1,5 +1,5 @@
 [package]
-name = "server"
+name = "flexfolio"
 version = "0.0.1"
 authors = ["logicfan"]
 edition = "2021"
@@ -16,13 +16,20 @@ hmac = "0.12"
 # decimal
 rust_decimal = { version = "1.36", features = ["serde", "serde-float"] }
 rust_decimal_macros = "1.36"
-# database
+# storage
 serde = { version = "1.0", features = ["derive"] }
-polodb_core = "5.1"
-rusqlite = { version = "0.32", features = ["bundled"] }
-# utility
-uuid = "1.10"
+serde_json = { version = "1.0" }
+serde_rusqlite = "0.36"
+uuid = { version = "1.10", features = ["v4", "v5", "v7", "serde"] }
 chrono = { version = "0.4", features = ["serde"] }
+rusqlite = { version = "0.32", features = [
+    "bundled",
+    "uuid",
+    "serde_json",
+    "chrono",
+] }
+# utility
 derive_more = { version = "1.0", features = ["display", "from"] }
 const_format = "0.2"
 log = "0.4"
+env_logger = "0.11"

@@ -5,8 +5,10 @@ use actix_web::{App, HttpServer};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    if let Err(error) = server::init() {
-        panic!("fail to initialize the server {}", error)
+    env_logger::init();
+
+    if let Err(error) = flexfolio::init() {
+        panic!("Fail to initialize the server with error: {}", error)
     }
 
     HttpServer::new(move || {
@@ -20,7 +22,7 @@ async fn main() -> std::io::Result<()> {
             // .service(investment::account::upsert)
             // .service(investment::account::delete)
             .service(Files::new("/", "dist/").index_file("index.html"))
-            .default_service(web::to(server::index))
+            .default_service(web::to(flexfolio::index))
     })
     .bind(("0.0.0.0", 8080))?
     .run()
