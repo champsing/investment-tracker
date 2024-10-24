@@ -1,15 +1,12 @@
 # Node.JS
-node_modules
-dist
+/node_modules
+/dist
 
 # Rust
-target
+/target
 
 # Runtime
-data
+/data
 
 # Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-!.vscode/settings.json
 .DS_Store
