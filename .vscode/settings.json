@@ -35,4 +35,5 @@
         "TFSA",
         "vuestic"
     ],
+    "svg.preview.background": "transparent",
 }
