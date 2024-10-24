@@ -1,6 +1,7 @@
 use actix_files::Files;
 use actix_web::web;
 use actix_web::{App, HttpServer};
+use flexfolio::user;
 // use server::{auth, constant, investment};
 
 #[actix_web::main]
@@ -13,11 +14,11 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
-            // .service(auth::login)
-            // .service(auth::refresh)
-            // .service(auth::all_users)
-            // .service(auth::upsert)
-            // .service(auth::delete)
+            .service(user::signup::handler)
+            .service(user::login::handler)
+            .service(user::rotate::handler)
+            .service(user::update::handler)
+            .service(user::delete::handler)
             // .service(investment::account::query)
             // .service(investment::account::upsert)
             // .service(investment::account::delete)

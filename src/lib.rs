@@ -1,5 +1,7 @@
 mod database;
 mod error;
+pub mod investment;
+pub mod user;
 
 // pub mod auth;
 // pub mod investment;

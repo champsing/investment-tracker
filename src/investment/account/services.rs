@@ -1,27 +1,5 @@
-pub mod query {
-    use super::super::database;
-    use crate::{auth::verify, error::Result};
-    use actix_web::{post, web, HttpResponse, Responder};
-    use serde::Deserialize;
-    use std::time::{SystemTime, UNIX_EPOCH};
+pub mod insert {
 
-    #[derive(Debug, Deserialize)]
-    struct Request {
-        token: String,
-    }
-
-    #[post("/api/investment/account/query")]
-    pub async fn handler(request: web::Json<Request>) -> Result<impl Responder> {
-        let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
-
-        match verify(&request.token, now) {
-            Some(_) => {
-                let accounts: Vec<_> = database::query()?.into_iter().collect();
-                Ok(HttpResponse::Ok().json(accounts))
-            }
-            _ => Ok(HttpResponse::Forbidden().finish()),
-        }
-    }
 }
 
 pub mod upsert {

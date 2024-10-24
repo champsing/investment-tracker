@@ -5,7 +5,8 @@ use derive_more::{Display, From};
 pub enum ServerError {
     Time(std::time::SystemTimeError),
     Io(std::io::Error),
-    Sqlite(rusqlite::Error),
+    Rusqlite(rusqlite::Error),
+    SeaQuery(sea_query::error::Error),
     Json(serde_json::Error),
     Jwt(jwt::Error),
     #[from(skip)]
