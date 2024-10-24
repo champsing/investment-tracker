@@ -5,11 +5,11 @@ CREATE TABLE `Accounts` (
     `type` TEXT NOT NULL
 );
 
-CREATE TABLE `Transcations` (
+CREATE TABLE `Transactions` (
     `id` TEXT PRIMARY KEY NOT NULL,
     `account` TEXT NOT NULL REFERENCES `Accounts` (id),
     `date` DATE NOT NULL,
     `action` TEXT NOT NULL
 );
 
-CREATE INDEX `Transactions_0` ON `Transcations` (`date`);
+CREATE INDEX `Transactions_0` ON `Transactions` (`date`);
