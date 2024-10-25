@@ -17,6 +17,7 @@ pub async fn handler(
 ) -> Result<impl Responder, ServerError> {
     let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
 
+    // permission check
     let user_id = authenticate(&request.token, now);
     if user_id.is_none() {
         return Ok(HttpResponse::Forbidden().finish());

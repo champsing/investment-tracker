@@ -20,6 +20,11 @@ pub async fn handler(
 ) -> Result<impl Responder, ServerError> {
     let user = database::users::select(None, Some(request.username.clone()))?;
 
+    // permission check
+    if user.is_none() {
+        return Ok(HttpResponse::Forbidden().finish());
+    }
+    let user = user.unwrap();
     if Sha256::digest(request.password.clone()).to_vec() != user.password {
         return Ok(HttpResponse::Forbidden().finish());
     }

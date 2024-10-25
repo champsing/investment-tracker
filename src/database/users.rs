@@ -78,7 +78,7 @@ pub fn delete(id: Uuid) -> Result<(), ServerError> {
 pub fn select(
     id: Option<Uuid>,
     username: Option<String>,
-) -> Result<User, ServerError> {
+) -> Result<Option<User>, ServerError> {
     let (query, values) = Query::select()
         .columns([UserIden::Id, UserIden::Username, UserIden::Password])
         .from(UserIden::Table)
@@ -102,11 +102,5 @@ pub fn select(
         })?
         .next();
 
-    match record {
-        None => Err(ServerError::Internal(format!(
-            "user {:?} {:?} does not exist",
-            id, username
-        ))),
-        Some(user) => Ok(user?),
-    }
+    Ok(record.transpose()?)
 }

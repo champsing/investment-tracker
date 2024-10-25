@@ -16,6 +16,7 @@ struct Request {
 pub async fn handler(
     request: web::Json<Request>,
 ) -> Result<impl Responder, ServerError> {
+    // input check
     if request.username.len() < 6 {
         return Ok(HttpResponse::BadRequest().body("username too short"));
     } else if request.password.len() < 8 {
