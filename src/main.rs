@@ -1,7 +1,7 @@
 use actix_files::Files;
 use actix_web::web;
 use actix_web::{App, HttpServer};
-use flexfolio::user;
+use flexfolio::{investment, user};
 // use server::{auth, constant, investment};
 
 #[actix_web::main]
@@ -19,8 +19,8 @@ async fn main() -> std::io::Result<()> {
             .service(user::rotate::handler)
             .service(user::update::handler)
             .service(user::delete::handler)
-            // .service(investment::account::query)
-            // .service(investment::account::upsert)
+            .service(investment::account::insert::handler)
+            .service(investment::account::fetch::handler)
             // .service(investment::account::delete)
             .service(Files::new("/", "dist/").index_file("index.html"))
             .default_service(web::to(flexfolio::index))

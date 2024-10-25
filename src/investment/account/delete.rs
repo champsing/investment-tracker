@@ -8,6 +8,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 #[derive(Debug, Deserialize)]
 struct Request {
+    #[allow(unused)]
     token: String,
     account: Account,
 }
