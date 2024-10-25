@@ -1,13 +1,15 @@
 {
-    "css.validate": false,
     "files.eol": "\n",
+    "editor.rulers": [
+        80
+    ],
     "tailwindCSS.includeLanguages": {
         "vue": "html",
         "vue-html": "html"
     },
-    "editor.rulers": [
-        80
-    ],
+    "css.validate": false,
+    "html.format.wrapLineLength": 80,
+    "html.format.wrapAttributes": "aligned-multiple",
     "SQL-Formatter-VSCode.dialect": "sqlite",
     "SQL-Formatter-VSCode.dataTypeCase": "upper",
     "SQL-Formatter-VSCode.functionCase": "upper",
@@ -26,6 +28,7 @@
         "FHSA",
         "flexfolio",
         "formatcp",
+        "Hasher",
         "Hmac",
         "Iden",
         "materialdesignicons",
