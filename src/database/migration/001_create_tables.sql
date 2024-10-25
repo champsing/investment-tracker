@@ -1,7 +1,7 @@
 CREATE TABLE `users` (
     `id` TEXT PRIMARY KEY NOT NULL,
     `username` TEXT UNIQUE NOT NULL,
-    `password` BLOB NOT NULL,
+    `password` BLOB NOT NULL
 );
 
 CREATE INDEX `users_i0` ON `users` (`username`);
