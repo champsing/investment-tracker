@@ -25,20 +25,17 @@ pub async fn handler(
     let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
 
     // permission check
-    let user_id = authenticate(&request.token, now);
-    if user_id.is_none() {
-        return Ok(HttpResponse::Forbidden().finish());
-    }
-    let user_id = user_id.unwrap();
-
-    let user = database::users::select(Some(user_id), None)?;
-    if user.is_none() {
-        return Ok(HttpResponse::BadRequest().finish());
-    }
-    let user = user.unwrap();
+    let id = match authenticate(&request.token, now) {
+        None => return Ok(HttpResponse::Forbidden().finish()),
+        Some(i) => i
+    };
+    let user = match database::users::select(Some(id), None)? {
+        None => return Ok(HttpResponse::BadRequest().finish()),
+        Some(u) => u
+    };
 
     let claims = Claims {
-        iss: user_id,
+        iss: id,
         iat: now,
         exp: now + 3600,
     };

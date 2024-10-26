@@ -24,13 +24,12 @@ struct Response {
 pub async fn handler(
     request: web::Json<Request>,
 ) -> Result<impl Responder, ServerError> {
-    let user = database::users::select(None, Some(request.username.clone()))?;
-
     // permission check
-    if user.is_none() {
-        return Ok(HttpResponse::Forbidden().finish());
-    }
-    let user = user.unwrap();
+    let user =
+        match database::users::select(None, Some(request.username.clone()))? {
+            None => return Ok(HttpResponse::BadRequest().finish()),
+            Some(u) => u,
+        };
     if Sha256::digest(request.password.clone()).to_vec() != user.password {
         return Ok(HttpResponse::Forbidden().finish());
     }

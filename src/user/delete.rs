@@ -9,7 +9,7 @@ use uuid::Uuid;
 #[derive(Debug, Deserialize)]
 struct Request {
     token: String,
-    user_id: Uuid,
+    id: Uuid,
 }
 
 #[post("/api/user/delete")]
@@ -19,15 +19,14 @@ pub async fn handler(
     let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
 
     // permission check
-    let user_id = authenticate(&request.token, now);
-    if user_id.is_none() {
-        return Ok(HttpResponse::Forbidden().finish());
-    }
-    let user_id = user_id.unwrap();
-    if user_id != request.user_id {
+    let id = match authenticate(&request.token, now) {
+        None => return Ok(HttpResponse::Forbidden().finish()),
+        Some(i) => i,
+    };
+    if id != request.id {
         return Ok(HttpResponse::Forbidden().finish());
     }
 
-    database::users::delete(request.user_id)?;
+    database::users::delete(request.id)?;
     Ok(HttpResponse::Ok().finish())
 }
