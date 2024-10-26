@@ -80,59 +80,10 @@ function beforeOkPwd(hide: () => void) {
         pwdModal.err1 = 'wrong password';
     }).finally(() => pwdModal.wait = false)
 }
-
-// function upsert() {
-//     if (modalForm.username.length > 3 && modalForm.password.length > 7) {
-//         axios.post('/api/auth/upsert', {
-//             token: localStorage.getItem('token'),
-//             username: modalForm.username,
-//             password: modalForm.password,
-//             group: modalForm.group,
-//         }).then(_ => {
-//             fetch()
-//         })
-//         clean()
-//     } else {
-//         modal.upsert = true
-//     }
-// }
-// // remove
-// function removeModal(username: string) {
-//     modalForm.username = username
-//     modal.delete = true
-// }
-// function remove() {
-//     axios.post('/api/auth/delete', {
-//         token: localStorage.getItem('token'),
-//         username: modalForm.username,
-//     }).then(_ => {
-//         fetch()
-//     })
-//     clean()
-// }
-// // clean
-// function clean() {
-//     modalForm.username = ''
-//     modalForm.password = ''
-//     modalForm.group = 'Viewer'
-// }
-// function logout() {
-//     localStorage.removeItem('token');
-//     location.reload();
-// }
-
-// const users = ref<User[]>([])
-// const columns = [
-//     { key: 'username' },
-//     { key: 'group', label: 'permission' },
-//     { key: 'username', name: 'actions', label: 'actions', width: 80 },
-// ]
-
-// fetch()
 </script>
 
 <template>
-    <VaCard>
+    <VaCard stripe stripe-color="success">
         <VaCardTitle>User Setting</VaCardTitle>
         <VaCardContent class="flex flex-col">
             <div class="flex items-center justify-around">

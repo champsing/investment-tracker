@@ -3,12 +3,14 @@ use crate::error::ServerError;
 use crate::user::authenticate;
 use actix_web::{post, web, HttpResponse, Responder};
 use serde::Deserialize;
+use sha2::{Digest, Sha256};
 use std::time::{SystemTime, UNIX_EPOCH};
 use uuid::Uuid;
 
 #[derive(Debug, Deserialize)]
 struct Request {
     token: String,
+    password: String,
     id: Uuid,
 }
 
@@ -24,6 +26,13 @@ pub async fn handler(
         Some(i) => i,
     };
     if id != request.id {
+        return Ok(HttpResponse::Forbidden().finish());
+    }
+    let user = match database::users::select(Some(request.id), None)? {
+        None => return Ok(HttpResponse::BadRequest().finish()),
+        Some(u) => u,
+    };
+    if user.password != Sha256::digest(request.password.clone()).to_vec() {
         return Ok(HttpResponse::Forbidden().finish());
     }
 

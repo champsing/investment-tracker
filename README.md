@@ -1,8 +1,27 @@
-# Investment Tracker
+# Flexfolio
 
 ## TODO
 
-- [ ] Login Page
+### Users
+
+- [ ] delete user
+
+### Accounts
+
+- [ ] insert
+- [ ] update name, alias, or kind
+- [ ] delete
+- [ ] show
+
+### Transactions
+
+- [ ] Deposit / Withdrawal
+- [ ] Fee / Reimbursement
+- [ ] Buy / Sell
+- [ ] Interest / Dividend
+- [ ] ForEx
+- [ ] Journal
+- [ ] Split
 
 ## Recommended IDE Setup
 
