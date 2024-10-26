@@ -148,8 +148,8 @@ pub fn select_by_user(user_id: Uuid) -> Result<Vec<Account>, ServerError> {
                 id: row.get(0)?,
                 name: row.get(1)?,
                 alias: row.get(2)?,
-                owner: row.get(2)?,
-                kind: row.get(2)?,
+                owner: row.get(3)?,
+                kind: row.get(4)?,
             })
         })?
         .collect();

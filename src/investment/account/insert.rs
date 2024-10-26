@@ -19,20 +19,21 @@ pub async fn handler(
     let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
 
     // permission check
-    let user_id = authenticate(&request.token, now);
-    if user_id.is_none() {
-        return Ok(HttpResponse::Forbidden().finish());
-    }
-    let user_id = user_id.unwrap();
-    if user_id != request.account.owner {
+    let user_id = match authenticate(&request.token, now) {
+        None => return Ok(HttpResponse::Forbidden().finish()),
+        Some(i) => i,
+    };
+    if request.account.owner != user_id {
         return Ok(HttpResponse::Forbidden().finish());
     }
 
     // input check
     if !request.account.id.is_nil() {
-        return Ok(HttpResponse::BadRequest().body("id should be nil"));
-    } else if request.account.name.len() < 6 {
+        return Ok(HttpResponse::BadRequest().body("account id should be nil"));
+    } else if request.account.name.len() < 4 {
         return Ok(HttpResponse::BadRequest().body("account name too short"));
+    } else if request.account.alias.len() < 4 {
+        return Ok(HttpResponse::BadRequest().body("account alias too short"));
     }
 
     database::accounts::insert(request.account.clone())?;

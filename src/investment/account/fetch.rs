@@ -17,11 +17,10 @@ pub async fn handler(
     let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
 
     // permission check
-    let user_id = authenticate(&request.token, now);
-    if user_id.is_none() {
-        return Ok(HttpResponse::Forbidden().finish());
-    }
-    let user_id = user_id.unwrap();
+    let user_id = match authenticate(&request.token, now) {
+        None => return Ok(HttpResponse::Forbidden().finish()),
+        Some(i) => i
+    };
 
     let accounts = database::accounts::select_by_user(user_id)?;
     Ok(HttpResponse::Ok().json(accounts))
