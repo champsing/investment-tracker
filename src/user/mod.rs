@@ -4,7 +4,6 @@ pub mod register;
 pub mod rotate;
 pub mod update;
 pub mod exist;
-pub mod username;
 
 use hmac::{Hmac, Mac};
 use jwt::{Header, Token, VerifyWithKey};

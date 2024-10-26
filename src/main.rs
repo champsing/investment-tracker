@@ -19,7 +19,6 @@ async fn main() -> std::io::Result<()> {
             .service(user::update::handler)
             .service(user::delete::handler)
             .service(user::exist::handler)
-            .service(user::username::handler)
             .service(investment::account::insert::handler)
             .service(investment::account::fetch::handler)
             // .service(investment::account::delete)
