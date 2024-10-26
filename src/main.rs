@@ -14,11 +14,12 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
-            .service(user::signup::handler)
+            .service(user::register::handler)
             .service(user::login::handler)
             .service(user::rotate::handler)
             .service(user::update::handler)
             .service(user::delete::handler)
+            .service(user::username::handler)
             .service(investment::account::insert::handler)
             .service(investment::account::fetch::handler)
             // .service(investment::account::delete)

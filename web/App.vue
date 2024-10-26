@@ -1,13 +1,6 @@
 <script setup lang="ts">
-import { computed, ref } from "vue"
-import {
-    useColors,
-    VaSidebar,
-    VaSidebarItem,
-    VaSidebarItemContent,
-    VaSidebarItemTitle,
-    VaIcon
-} from "vuestic-ui";
+import { useColors } from "vuestic-ui";
+import Login from "./components/Login.vue";
 
 // dark theme
 useColors().applyPreset('dark');
@@ -34,8 +27,14 @@ useColors().applyPreset('dark');
                     </VaButton>
                 </VaNavbarItem>
             </template>
+
+            <template #right>
+                <VaNavbarItem>
+                    <Login />
+                </VaNavbarItem>
+            </template>
         </VaNavbar>
-        <div class="p-4">
+        <div class="px-4 pt-2">
             <RouterView />
         </div>
     </div>
@@ -58,23 +57,5 @@ useColors().applyPreset('dark');
 // make navigation bar slimmer
 .va-navbar {
     --va-navbar-padding-y: 0.6rem;
-}
-
-.login-card {
-    height: 300px;
-    width: 400px;
-}
-
-.va-modal__dialog {
-    width: 400px;
-    --va-modal-dialog-height: 300px;
-}
-
-.va-modal__message {
-    flex-grow: 1;
-}
-
-.va-modal__inner {
-    height: 100%;
 }
 </style>

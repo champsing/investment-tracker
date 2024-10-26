@@ -12,7 +12,7 @@ struct Request {
     password: String,
 }
 
-#[post("/api/user/signup")]
+#[post("/api/user/register")]
 pub async fn handler(
     request: web::Json<Request>,
 ) -> Result<impl Responder, ServerError> {
