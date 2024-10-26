@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { reactive, ref } from "vue";
+import { reactive } from "vue";
 import { VaInput, VaButton, VaModal } from 'vuestic-ui';
 import axios from "axios";
+
+const authorize = defineModel<boolean>({ required: true })
 
 const modal = reactive({
     show: false,
@@ -15,7 +17,6 @@ const modal = reactive({
     password3: '',
     err3: '',
 })
-const auth = ref(false)
 
 function reset() {
     modal.wait = false;
@@ -97,13 +98,13 @@ function beforeOk(hide: () => void) {
         }).then(response => {
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('username', response.data.username);
-            auth.value = true;
             modal.wait = false;
+            authorize.value = true;
             hide()
         }).catch(_ => {
             modal.err2 = "wrong password";
-            auth.value = false;
             modal.wait = false;
+            authorize.value = false;
         })
     } else {
         axios.post("/api/user/register", {
@@ -126,7 +127,7 @@ function username(): string {
 function logout() {
     localStorage.removeItem('token')
     localStorage.removeItem('username')
-    auth.value = false;
+    authorize.value = false;
 }
 
 function rotateToken() {
@@ -137,12 +138,12 @@ function rotateToken() {
         }).then(response => {
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('username', response.data.username);
-            auth.value = true;
+            authorize.value = true;
         }).catch(_ => {
             logout();
         })
     } else {
-        auth.value = false;
+        authorize.value = false;
     }
 }
 rotateToken();
@@ -150,9 +151,9 @@ setInterval(rotateToken, 1000 * 60);
 </script>
 
 <template>
-    <template v-if="!auth">
-        <VaButton icon="ms-login" @click="showModal()" class="login-button">
-            Login</VaButton>
+    <template v-if="!authorize">
+        <VaButton icon="ms-login" background-opacity="0" color="textPrimary"
+                  @click="showModal()" class="login-button" />
     </template>
     <template v-else>
         <VaButtonDropdown background-opacity="0" color="textPrimary" hide-icon
@@ -166,7 +167,8 @@ setInterval(rotateToken, 1000 * 60);
                     {{ username() }}
                 </div>
                 <VaDivider />
-                <VaButton background-opacity="0" color="textPrimary">
+                <VaButton background-opacity="0" color="textPrimary"
+                          to="/settings">
                     Settings
                 </VaButton>
                 <VaButton background-opacity="0" color="textPrimary"
