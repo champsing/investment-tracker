@@ -2,7 +2,7 @@
 import { ref, reactive } from "vue"
 import axios from "axios";
 import { VaDataTable, VaButton } from 'vuestic-ui';
-import { userGroup } from '@/composables/auth';
+import { getUsername } from '@/composables/user';
 
 interface User { username: string, group: string }
 
@@ -92,7 +92,7 @@ fetch()
 <template>
     <VaCard>
         <VaCardTitle>Users</VaCardTitle>
-        <template v-if="userGroup() == 'Editor'">
+        <template v-if="getUsername() == 'Editor'">
             <VaCardBlock horizontal>
                 <VaCardBlock class="flex-auto flex items-center justify-evenly">
                     <VaButton class="flex-grow-0 w-24" @click="upsertModal('')">Add Users</VaButton>

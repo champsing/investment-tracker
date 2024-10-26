@@ -1,8 +1,9 @@
 pub mod delete;
 pub mod login;
 pub mod register;
-pub mod update;
 pub mod rotate;
+pub mod update;
+pub mod exist;
 pub mod username;
 
 use hmac::{Hmac, Mac};
@@ -17,10 +18,10 @@ static PRIVATE_KEY: LazyLock<Hmac<Sha256>> = LazyLock::new(|| {
     let mut rng = rand::thread_rng();
     let mut bytes = [0_u8; 32];
     rng.fill_bytes(&mut bytes);
-    
+
     // test code, use 0 as hmac key
     let bytes = [0_u8; 32];
-    
+
     Hmac::new_from_slice(&bytes).expect("fail to generate HMAC key.")
 });
 

@@ -4,7 +4,7 @@ use crate::error::ServerError;
 use crate::user::Claims;
 use actix_web::{post, web, HttpResponse, Responder};
 use jwt::SignWithKey;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -12,6 +12,12 @@ use std::time::{SystemTime, UNIX_EPOCH};
 struct Request {
     username: String,
     password: String,
+}
+
+#[derive(Debug, Serialize)]
+struct Response {
+    username: String,
+    token: String,
 }
 
 #[post("/api/user/login")]
@@ -36,5 +42,9 @@ pub async fn handler(
         exp: now + 3600,
     };
     let token = claims.sign_with_key(&*PRIVATE_KEY)?;
-    Ok(HttpResponse::Ok().body(token))
+    let response = Response {
+        username: user.username,
+        token,
+    };
+    Ok(HttpResponse::Ok().json(response))
 }

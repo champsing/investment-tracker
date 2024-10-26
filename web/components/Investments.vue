@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import Edit from './investments/edit/Accounts.vue';
+import Accounts from './investments/Accounts.vue';
 </script>
 
 <template>
-    <Edit />
+    <Accounts />
 </template>
 
 <style scoped></style>
