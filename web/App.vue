@@ -11,9 +11,9 @@ const authorize = ref(false);
 </script>
 
 <template>
-    <div class="background"
-         :style="{ backgroundColor: useColors().colors.backgroundPrimary }">
-        <VaNavbar>
+    <div :style="{ backgroundColor: useColors().colors.backgroundPrimary }"
+         class="h-full min-h-screen w-screen">
+        <VaNavbar class="va-navbar-p-slim">
             <template #left>
                 <VaNavbarItem>
                     <img src="@assets/icon.svg" alt="logo" height="32"
@@ -42,28 +42,12 @@ const authorize = ref(false);
                 </VaNavbarItem>
             </template>
         </VaNavbar>
-        <div class="px-4 pt-2">
-            <RouterView />
-        </div>
+        <RouterView />
     </div>
 </template>
 
 <style scoped>
-.background {
-    height: 100%;
-    width: 100%;
-    min-height: 100vh;
-    min-width: 100vw;
-}
-</style>
-<style lang="scss">
-// ensure browser scroll bar is dark
-:root {
-    color-scheme: dark;
-}
-
-// make navigation bar slimmer
-.va-navbar {
+.va-navbar-p-slim {
     --va-navbar-padding-y: 0.6rem;
 }
 </style>
