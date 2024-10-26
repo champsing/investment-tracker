@@ -12,7 +12,7 @@ const authorize = ref(false);
 
 <template>
     <div :style="{ backgroundColor: useColors().colors.backgroundPrimary }"
-         class="h-full min-h-screen w-screen">
+         class="h-full w-full min-h-screen">
         <VaNavbar class="va-navbar-p-slim">
             <template #left>
                 <VaNavbarItem>
@@ -42,7 +42,7 @@ const authorize = ref(false);
                 </VaNavbarItem>
             </template>
         </VaNavbar>
-        <RouterView />
+        <RouterView v-model:model-value="authorize" />
     </div>
 </template>
 

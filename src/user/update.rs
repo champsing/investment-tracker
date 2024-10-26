@@ -10,7 +10,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 struct Request {
     token: String,
     username: Option<String>,
-    password: Option<String>,
+    password: Option<(String, String)>,
 }
 
 #[post("/api/user/update")]
@@ -33,8 +33,12 @@ pub async fn handler(
     if let Some(username) = request.username.clone() {
         user.username = username
     }
-    if let Some(password) = request.password.clone() {
-        user.password = Sha256::digest(password).to_vec()
+    if let Some((old_password, new_password)) = request.password.clone() {
+        // another permission check
+        if user.password != Sha256::digest(old_password).to_vec() {
+            return Ok(HttpResponse::Forbidden().finish());
+        }
+        user.password = Sha256::digest(new_password).to_vec()
     }
 
     database::users::update(user)?;

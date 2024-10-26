@@ -1,71 +1,73 @@
 <script setup lang="ts">
 import Users from './settings/Users.vue';
+
+const authorize = defineModel<boolean>({ required: true })
 </script>
 
 <template>
     <div class="px-4 gap-2 columns-4">
         <div class="setting-item">
-            <Users />
+            <Users v-model:model-value="authorize" />
         </div>
         <div class="setting-item">
-            <Users />
+            <Users v-model:model-value="authorize" />
         </div>
         <div class="setting-item">
-            <Users />
+            <Users v-model:model-value="authorize" />
         </div>
         <div class="setting-item">
-            <Users />
+            <Users v-model:model-value="authorize" />
         </div>
         <div class="setting-item">
-            <Users />
+            <Users v-model:model-value="authorize" />
         </div>
         <div class="setting-item">
-            <Users />
+            <Users v-model:model-value="authorize" />
         </div>
         <div class="setting-item">
-            <Users />
+            <Users v-model:model-value="authorize" />
         </div>
         <div class="setting-item">
-            <Users />
+            <Users v-model:model-value="authorize" />
         </div>
         <div class="setting-item">
-            <Users />
+            <Users v-model:model-value="authorize" />
         </div>
         <div class="setting-item">
-            <Users />
+            <Users v-model:model-value="authorize" />
         </div>
         <div class="setting-item">
-            <Users />
+            <Users v-model:model-value="authorize" />
         </div>
         <div class="setting-item">
-            <Users />
+            <Users v-model:model-value="authorize" />
         </div>
         <div class="setting-item">
-            <Users />
+            <Users v-model:model-value="authorize" />
         </div>
         <div class="setting-item">
-            <Users />
+            <Users v-model:model-value="authorize" />
         </div>
         <div class="setting-item">
-            <Users />
+            <Users v-model:model-value="authorize" />
         </div>
         <div class="setting-item">
-            <Users />
+            <Users v-model:model-value="authorize" />
         </div>
         <div class="setting-item">
-            <Users />
+            <Users v-model:model-value="authorize" />
         </div>
         <div class="setting-item">
-            <Users />
+            <Users v-model:model-value="authorize" />
         </div>
         <div class="setting-item">
-            <Users />
+            <Users v-model:model-value="authorize" />
         </div>
         <div class="setting-item">
-            <Users />
+            <Users v-model:model-value="authorize" />
         </div>
         <div class="setting-item">
-            <Users />
+            <Users v-model:model-value="authorize" />
         </div>
     </div>
 </template>

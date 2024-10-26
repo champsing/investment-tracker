@@ -2,6 +2,7 @@
 import { reactive } from "vue";
 import { VaInput, VaButton, VaModal } from 'vuestic-ui';
 import axios from "axios";
+import { logout, login, validUsr, validPwd, matchPwd } from '@composables/user';
 
 const authorize = defineModel<boolean>({ required: true })
 
@@ -36,42 +37,11 @@ function showModal() {
     reset();
 }
 
-function validateUsername1() {
-    if (modal.login == false) {
-        if (modal.username1.length < 6) {
-            modal.err1 = 'username too short'
-        } else {
-            axios.post("/api/user/exist", {
-                username: modal.username1,
-            }).then(response => {
-                if (response.data) {
-                    modal.err1 = 'username already exists'
-                } else {
-                    modal.err1 = ''
-                }
-            }).catch(_ => {
-            })
-        }
-    }
-}
-
-function validatePassword2() {
-    if (modal.login == false) {
-        if (modal.password2.length < 8) {
-            modal.err2 = 'password too short'
-        } else {
-            modal.err2 = ''
-        }
-    } else {
+function validPwd2() {
+    if (modal.login) {
         modal.err2 = ''
-    }
-}
-
-function validatePassword3() {
-    if (modal.password2 != modal.password3) {
-        modal.err3 = 'password does not match'
     } else {
-        modal.err3 = ''
+        validPwd(modal);
     }
 }
 
@@ -96,25 +66,24 @@ function beforeOk(hide: () => void) {
             username: modal.username1,
             password: modal.password2,
         }).then(response => {
-            localStorage.setItem('token', response.data.token);
-            localStorage.setItem('username', response.data.username);
-            modal.wait = false;
+            hide();
+            login(response.data);
             authorize.value = true;
-            hide()
         }).catch(_ => {
             modal.err2 = "wrong password";
-            modal.wait = false;
             authorize.value = false;
+        }).finally(() => {
+            modal.wait = false;
         })
     } else {
         axios.post("/api/user/register", {
             username: modal.username1,
             password: modal.password2,
         }).then(_ => {
-            modal.wait = false;
             modal.login = true;
         }).catch(_ => {
             modal.err2 = "please try again";
+        }).finally(() => {
             modal.wait = false;
         })
     }
@@ -124,23 +93,17 @@ function username(): string {
     return localStorage.getItem('username');
 }
 
-function logout() {
-    localStorage.removeItem('token')
-    localStorage.removeItem('username')
-    authorize.value = false;
-}
-
 function rotateToken() {
     let token = localStorage.getItem('token');
     if (token != null) {
         axios.post("/api/user/rotate", {
             token: token
         }).then(response => {
-            localStorage.setItem('token', response.data.token);
-            localStorage.setItem('username', response.data.username);
+            login(response.data);
             authorize.value = true;
         }).catch(_ => {
             logout();
+            authorize.value = false;
         })
     } else {
         authorize.value = false;
@@ -172,7 +135,7 @@ setInterval(rotateToken, 1000 * 60);
                     Settings
                 </VaButton>
                 <VaButton background-opacity="0" color="textPrimary"
-                          @click="logout()">
+                          @click="authorize = false; logout()">
                     Logout
                 </VaButton>
             </div>
@@ -183,13 +146,13 @@ setInterval(rotateToken, 1000 * 60);
         <div class="w-80 flex flex-col items-center">
             <VaInput v-model="modal.username1" label="Username" name="Username"
                      immediate-validation :error="modal.err1 != ''"
-                     :error-messages="modal.err1" @input="validateUsername1()"
+                     :error-messages="modal.err1"
+                     @input="modal.login || validUsr(modal)"
                      class="w-4/5 flex-grow-0" />
             <VaInput v-model="modal.password2" label="Password" name="Password"
                      type="password" immediate-validation
                      :error="modal.err2 != ''" :error-messages="modal.err2"
-                     @input="validatePassword2()"
-                     class="w-4/5 flex-grow-0 mt-2" />
+                     @input="validPwd2()" class="w-4/5 flex-grow-0 mt-2" />
             <template v-if="modal.login">
                 <div class="w-4/5 flex-grow-0 mt-4">
                     Don't have an account?
@@ -201,8 +164,7 @@ setInterval(rotateToken, 1000 * 60);
                 <VaInput v-model="modal.password3" label="Repeat Password"
                          name="Repeat Password" type="password"
                          immediate-validation :error="modal.err3 != ''"
-                         :error-messages="modal.err3"
-                         @input="validatePassword3()"
+                         :error-messages="modal.err3" @input="matchPwd(modal)"
                          class="w-4/5 flex-grow-0 mt-2" />
                 <div class="w-4/5 flex-grow-0 mt-4">
                     Already have an account?
