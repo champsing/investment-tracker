@@ -43,15 +43,7 @@ export function matchPwd(data: { password2: string, password3: string, err3: str
     }
 }
 
-export function getUsername(): string {
-    let token = localStorage.getItem('token')
-    if (token == null) {
-        return ""
-    }
-    return JSON.parse(atob(token.split('.')[1]))['iss']
-}
-
-export function userInfo(): { username: string, token: string } {
+export function userId(): string {
     let token = localStorage.getItem('token')
     if (token == null) {
         return null
