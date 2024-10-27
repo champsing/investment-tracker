@@ -17,7 +17,7 @@ fetch();
 </script>
 
 <template>
-    <div class="px-4 mt-2 grid grid-cols-4 gap-2">
+    <div class="px-4 mt-4 grid grid-cols-4 gap-4">
         <VaCard v-for="account in accounts" class="h-36">
             <VaCardTitle>
                 <div class="-mt-2 -mb-2 h-7 flex items-center">

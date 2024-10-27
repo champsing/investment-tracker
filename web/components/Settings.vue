@@ -6,7 +6,7 @@ const authorize = defineModel<boolean>({ required: true })
 </script>
 
 <template>
-    <div class="px-4 gap-2 columns-4">
+    <div class="px-4 gap-4 columns-4">
         <div class="setting-item">
             <Users v-model:model-value="authorize" />
         </div>
@@ -20,6 +20,6 @@ const authorize = defineModel<boolean>({ required: true })
 .setting-item {
     @apply inline-block;
     @apply w-full;
-    @apply mt-2;
+    @apply mt-4;
 }
 </style>
