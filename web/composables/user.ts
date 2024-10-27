@@ -22,7 +22,7 @@ export function getUsername(): string {
     return localStorage.getItem('username');
 }
 
-export async function hasUsername(username: string): Promise<boolean | string> {
+export async function duplicateUsername(username: string): Promise<boolean | string> {
     let hasUser = (await axios.post("/api/user/exist", {
         username: username,
     })).data;

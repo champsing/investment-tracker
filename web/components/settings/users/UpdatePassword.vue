@@ -1,46 +1,24 @@
 <script setup lang="ts">
-import { reactive } from "vue"
+import { reactive, ref } from "vue"
 import axios from "axios";
-import { VaButton } from 'vuestic-ui';
-import { logout, validPassword, matchPassword } from "@/composables/user";
-const authorize = defineModel<boolean>({ required: true })
+import { useForm } from 'vuestic-ui';
+import { logout } from "@/composables/user";
 
+const authorize = defineModel<boolean>({ required: true })
+const { isLoading, isValid, reset, validate } = useForm('formRef')
+
+const modal = ref(false);
 const form = reactive({
-    show: false,
-    wait: false,
     oldPassword: '',
-    oldPasswordErr: '',
     newPassword: '',
-    newPasswordErr: '',
-    repeatPassword: '',
-    repeatPasswordErr: '',
+    repPassword: '',
+    status200: true,
 })
 
-function newPasswordInput() {
-    validPassword(form.newPassword, (e) => form.newPasswordErr = e)
-}
+async function beforeOk(hide: () => void) {
+    validate();
+    if (isLoading.value || !isValid.value) { return; }
 
-function repeatPasswordInput() {
-    matchPassword(form.newPassword, form.repeatPassword, (e) => form.newPasswordErr = e)
-}
-
-function showModal() {
-    form.show = true;
-    form.oldPassword = '';
-    form.newPassword = '';
-    form.repeatPassword = '';
-    form.oldPasswordErr = '';
-    form.newPasswordErr = '';
-    form.repeatPasswordErr = '';
-}
-
-function beforeOk(hide: () => void) {
-    if (form.oldPasswordErr != '' || form.newPasswordErr != '' ||
-        form.repeatPasswordErr != '' || form.wait) {
-        return;
-    }
-
-    form.wait = true
     axios.post('/api/user/update', {
         token: localStorage.getItem('token'),
         password: [form.oldPassword, form.newPassword]
@@ -49,38 +27,32 @@ function beforeOk(hide: () => void) {
         logout();
         authorize.value = false;
     }).catch(_ => {
-        form.oldPasswordErr = 'wrong password';
-    }).finally(() => form.wait = false)
+        form.status200 = false;
+        validate();
+    })
 }
 </script>
 
 <template>
     <div class="flex-grow-0">
         <VaButton icon="ms-edit" background-opacity="0" color="textPrimary"
-                  @click="showModal()" />
-        <VaModal v-model="form.show" ok-text="Save" size="auto"
+                  @click="modal = true" />
+        <VaModal v-model="modal" ok-text="Save" size="auto" @open="reset"
                  :before-ok="beforeOk">
-            <div class="w-80 flex flex-col items-center">
+            <VaForm ref="formRef" class="w-80 flex flex-col items-center">
                 <VaInput v-model="form.oldPassword" label="Old Password"
-                         name="Old Password" type="password"
-                         immediate-validation :error="form.oldPasswordErr != ''"
-                         :error-messages="form.oldPasswordErr"
-                         @input="form.oldPasswordErr = ''"
+                         type="password" @input="(_) => form.status200 = true"
+                         :rules="[(_) => form.status200 || 'incorrect password']"
                          class="w-4/5 flex-grow-0 mt-2" />
                 <VaInput v-model="form.newPassword" label="New Password"
-                         name="New Password" type="password"
-                         immediate-validation :error="form.newPasswordErr != ''"
-                         :error-messages="form.newPasswordErr"
-                         @input="newPasswordInput()"
+                         type="password"
+                         :rules="[(x) => x.length >= 8 || 'password too short']"
                          class="w-4/5 flex-grow-0 mt-2" />
-                <VaInput v-model="form.repeatPassword" label="Repeat Password"
-                         name="Repeat Password" type="password"
-                         immediate-validation
-                         :error="form.repeatPasswordErr != ''"
-                         :error-messages="form.repeatPasswordErr"
-                         @input="repeatPasswordInput()"
+                <VaInput v-model="form.repPassword" label="Repeat Password"
+                         type="password"
+                         :rules="[(x) => x == form.newPassword || 'password does not match']"
                          class="w-4/5 flex-grow-0 mt-2" />
-            </div>
+            </VaForm>
         </VaModal>
     </div>
 </template>
