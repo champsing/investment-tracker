@@ -10,19 +10,26 @@ export function login(data: { token: string, username: string }) {
     localStorage.setItem('username', data.username);
 }
 
-export function validUsr(data: { username1: string, err1: string }) {
-    if (data.username1.length < 6) {
-        data.err1 = 'username too short'
+export function userId(): string {
+    let token = localStorage.getItem('token')
+    if (token == null) {
+        return null
+    }
+    return JSON.parse(atob(token.split('.')[1]))['iss']
+}
+
+export function validUsername(username: string, error: (e: string) => void) {
+    if (username.length < 6) {
+        error('username too short')
     } else {
         axios.post("/api/user/exist", {
-            username: data.username1,
+            username: username,
         }).then(response => {
             if (response.data) {
-                data.err1 = 'username already exists'
+                error('username already exists')
             } else {
-                data.err1 = ''
+                error('')
             }
-        }).catch(_ => {
         })
     }
 }
@@ -41,13 +48,5 @@ export function matchPwd(data: { password2: string, password3: string, err3: str
     } else {
         data.err3 = ''
     }
-}
-
-export function userId(): string {
-    let token = localStorage.getItem('token')
-    if (token == null) {
-        return null
-    }
-    return JSON.parse(atob(token.split('.')[1]))['iss']
 }
 

@@ -2,7 +2,7 @@
 import { reactive } from "vue";
 import { VaInput, VaButton, VaModal } from 'vuestic-ui';
 import axios from "axios";
-import { logout, login, validUsr, validPwd, matchPwd } from '@composables/user';
+import { logout, login, validUsername, validPwd, matchPwd } from '@composables/user';
 
 const authorize = defineModel<boolean>({ required: true })
 
@@ -35,6 +35,12 @@ function showModal() {
     form.show = true
     form.login = true
     reset();
+}
+
+function usernameInput() {
+    if (!form.login) {
+        validUsername(form.username1, (e) => form.err1 = e)
+    }
 }
 
 function validPwd2() {
@@ -146,8 +152,7 @@ setInterval(rotateToken, 1000 * 60);
         <div class="w-80 flex flex-col items-center">
             <VaInput v-model="form.username1" label="Username" name="Username"
                      immediate-validation :error="form.err1 != ''"
-                     :error-messages="form.err1"
-                     @input="form.login || validUsr(form)"
+                     :error-messages="form.err1" @input="usernameInput()"
                      class="w-4/5 flex-grow-0" />
             <VaInput v-model="form.password2" label="Password" name="Password"
                      type="password" immediate-validation

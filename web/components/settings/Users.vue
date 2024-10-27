@@ -2,28 +2,32 @@
 import { reactive } from "vue"
 import axios from "axios";
 import { VaButton } from 'vuestic-ui';
-import { logout, validUsr, validPwd, matchPwd } from "@/composables/user";
+import { logout, validUsername, validPwd, matchPwd } from "@/composables/user";
 const authorize = defineModel<boolean>({ required: true })
 
 const usernameForm = reactive({
     show: false,
     wait: false,
-    username1: '',
-    err1: '',
+    username: '',
+    error: '',
 })
 
-function username(): string {
+function getUsername(): string {
     return localStorage.getItem('username');
 }
 
-function showUsrModal() {
-    usernameForm.show = true;
-    usernameForm.username1 = username();
-    usernameForm.err1 = '';
+function usernameInput() {
+    validUsername(usernameForm.username, (e) => usernameForm.error = e)
 }
 
-function beforeOkUsr(hide: () => void) {
-    if (usernameForm.err1 != '') {
+function usernameShowModal() {
+    usernameForm.show = true;
+    usernameForm.username = getUsername();
+    usernameForm.error = '';
+}
+
+function usernameBeforeOk(hide: () => void) {
+    if (usernameForm.error != '') {
         return;
     }
     if (usernameForm.wait) { return; }
@@ -31,13 +35,13 @@ function beforeOkUsr(hide: () => void) {
     usernameForm.wait = true
     axios.post('/api/user/update', {
         token: localStorage.getItem('token'),
-        username: usernameForm.username1,
+        username: usernameForm.username,
     }).then(_ => {
         hide();
         logout();
         authorize.value = false;
     }).catch(_ => {
-        usernameForm.err1 = 'please try again';
+        usernameForm.error = 'please try again';
     }).finally(() => usernameForm.wait = false)
 }
 
@@ -87,10 +91,11 @@ function beforeOkPwd(hide: () => void) {
         <VaCardTitle>User Setting</VaCardTitle>
         <VaCardContent class="flex flex-col">
             <div class="flex items-center justify-around">
-                <div>username: <span class="font-bold">{{ username() }}</span>
+                <div>username: <span class="font-bold">{{ getUsername()
+                        }}</span>
                 </div>
                 <VaButton icon="ms-edit" background-opacity="0"
-                          color="textPrimary" @click="showUsrModal()"
+                          color="textPrimary" @click="usernameShowModal()"
                           class="flex-grow-0" />
             </div>
             <div class="flex items-center justify-around mt-2">
@@ -102,13 +107,13 @@ function beforeOkPwd(hide: () => void) {
         </VaCardContent>
     </VaCard>
     <VaModal v-model="usernameForm.show" ok-text="Save" size="auto"
-             :before-ok="beforeOkUsr">
+             :before-ok="usernameBeforeOk">
         <div class="w-80 flex flex-col items-center">
-            <VaInput v-model="usernameForm.username1" label="New Username"
+            <VaInput v-model="usernameForm.username" label="New Username"
                      name="New Username" immediate-validation
-                     :error="usernameForm.err1 != ''"
-                     :error-messages="usernameForm.err1" @input="validUsr(usernameForm)"
-                     class="w-4/5 flex-grow-0" />
+                     :error="usernameForm.error != ''"
+                     :error-messages="usernameForm.error"
+                     @input="usernameInput()" class="w-4/5 flex-grow-0" />
         </div>
     </VaModal>
     <VaModal v-model="passwordForm.show" ok-text="Save" size="auto"
@@ -117,17 +122,20 @@ function beforeOkPwd(hide: () => void) {
             <VaInput v-model="passwordForm.password1" label="Old Password"
                      name="Old Password" type="password" immediate-validation
                      :error="passwordForm.err1 != ''"
-                     :error-messages="passwordForm.err1" @input="passwordForm.err1 = ''"
+                     :error-messages="passwordForm.err1"
+                     @input="passwordForm.err1 = ''"
                      class="w-4/5 flex-grow-0 mt-2" />
             <VaInput v-model="passwordForm.password2" label="New Password"
                      name="New Password" type="password" immediate-validation
                      :error="passwordForm.err2 != ''"
-                     :error-messages="passwordForm.err2" @input="validPwd(passwordForm)"
+                     :error-messages="passwordForm.err2"
+                     @input="validPwd(passwordForm)"
                      class="w-4/5 flex-grow-0 mt-2" />
             <VaInput v-model="passwordForm.password3" label="Repeat Password"
                      name="Repeat Password" type="password" immediate-validation
                      :error="passwordForm.err3 != ''"
-                     :error-messages="passwordForm.err3" @input="matchPwd(passwordForm)"
+                     :error-messages="passwordForm.err3"
+                     @input="matchPwd(passwordForm)"
                      class="w-4/5 flex-grow-0 mt-2" />
         </div>
     </VaModal>
