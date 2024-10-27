@@ -22,6 +22,13 @@ export function getUsername(): string {
     return localStorage.getItem('username');
 }
 
+export async function hasUsername(username: string): Promise<boolean | string> {
+    let hasUser = (await axios.post("/api/user/exist", {
+        username: username,
+    })).data;
+    return !hasUser || 'username already exists'
+}
+
 export function validUsername(username: string, ret: (e: string) => void) {
     if (username.length < 6) {
         ret('username too short')

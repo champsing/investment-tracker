@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import axios from 'axios';
 import { ref } from 'vue';
-import { Account } from '@/composables/interface';
+import { Account } from '@/composables/account';
+import NewAccount from './accounts/NewAccount.vue';
 
 const accounts = ref<Account[]>([]);
+
+// const
 
 function fetch() {
     axios.post('/api/investment/account/fetch', {
@@ -34,12 +37,16 @@ fetch();
                 </div>
             </VaCardTitle>
             <VaCardContent>
-                123
+                <div class="flex items-center justify-between">
+                    <div class="text-xl flex-grow-0">CAD 2,000,000</div>
+                    <div class="flex-grow-0 flex flex-col items-end">
+                        <div>+1,000.11 (+2.34%)</div>
+                        <div>+14,000.11 (+11.34%)</div>
+                    </div>
+                </div>
             </VaCardContent>
         </VaCard>
-        <VaCard class="h-36 flex items-center justify-center">
-            <VaIcon name="ms-add" size="64px" class="flex-grow-0" />
-        </VaCard>
+        <NewAccount />
     </div>
 </template>
 

@@ -5,3 +5,10 @@ export interface Account {
     owner: string,
     kind: string
 };
+
+export const kindOptions = [
+    'NRA',
+    'TFSA',
+    'RRSP',
+    'FHSA'
+]
