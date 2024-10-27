@@ -6,7 +6,7 @@ import { logout, login, validUsr, validPwd, matchPwd } from '@composables/user';
 
 const authorize = defineModel<boolean>({ required: true })
 
-const modal = reactive({
+const form = reactive({
     show: false,
     login: true,
     wait: false,
@@ -20,33 +20,33 @@ const modal = reactive({
 })
 
 function reset() {
-    modal.wait = false;
+    form.wait = false;
 
-    modal.username1 = '';
-    modal.password2 = '';
-    modal.password3 = '';
+    form.username1 = '';
+    form.password2 = '';
+    form.password3 = '';
 
-    modal.err1 = '';
-    modal.err2 = '';
-    modal.err3 = '';
+    form.err1 = '';
+    form.err2 = '';
+    form.err3 = '';
 }
 
 function showModal() {
-    modal.show = true
-    modal.login = true
+    form.show = true
+    form.login = true
     reset();
 }
 
 function validPwd2() {
-    if (modal.login) {
-        modal.err2 = ''
+    if (form.login) {
+        form.err2 = ''
     } else {
-        validPwd(modal);
+        validPwd(form);
     }
 }
 
 function okText() {
-    if (modal.login) {
+    if (form.login) {
         return "Login"
     } else {
         return "Signup"
@@ -54,37 +54,37 @@ function okText() {
 }
 
 function beforeOk(hide: () => void) {
-    if (modal.err1 != '' || modal.err2 != '' || modal.err3 != '') {
+    if (form.err1 != '' || form.err2 != '' || form.err3 != '') {
         return;
     }
 
-    if (modal.wait) { return; }
+    if (form.wait) { return; }
 
-    modal.wait = true
-    if (modal.login) {
+    form.wait = true
+    if (form.login) {
         axios.post("/api/user/login", {
-            username: modal.username1,
-            password: modal.password2,
+            username: form.username1,
+            password: form.password2,
         }).then(response => {
             hide();
             login(response.data);
             authorize.value = true;
         }).catch(_ => {
-            modal.err2 = "wrong password";
+            form.err2 = "wrong password";
             authorize.value = false;
         }).finally(() => {
-            modal.wait = false;
+            form.wait = false;
         })
     } else {
         axios.post("/api/user/register", {
-            username: modal.username1,
-            password: modal.password2,
+            username: form.username1,
+            password: form.password2,
         }).then(_ => {
-            modal.login = true;
+            form.login = true;
         }).catch(_ => {
-            modal.err2 = "please try again";
+            form.err2 = "please try again";
         }).finally(() => {
-            modal.wait = false;
+            form.wait = false;
         })
     }
 }
@@ -141,35 +141,35 @@ setInterval(rotateToken, 1000 * 60);
             </div>
         </VaButtonDropdown>
     </template>
-    <VaModal v-model="modal.show" size="auto" :ok-text="okText()"
+    <VaModal v-model="form.show" size="auto" :ok-text="okText()"
              :before-ok="beforeOk">
         <div class="w-80 flex flex-col items-center">
-            <VaInput v-model="modal.username1" label="Username" name="Username"
-                     immediate-validation :error="modal.err1 != ''"
-                     :error-messages="modal.err1"
-                     @input="modal.login || validUsr(modal)"
+            <VaInput v-model="form.username1" label="Username" name="Username"
+                     immediate-validation :error="form.err1 != ''"
+                     :error-messages="form.err1"
+                     @input="form.login || validUsr(form)"
                      class="w-4/5 flex-grow-0" />
-            <VaInput v-model="modal.password2" label="Password" name="Password"
+            <VaInput v-model="form.password2" label="Password" name="Password"
                      type="password" immediate-validation
-                     :error="modal.err2 != ''" :error-messages="modal.err2"
+                     :error="form.err2 != ''" :error-messages="form.err2"
                      @input="validPwd2()" class="w-4/5 flex-grow-0 mt-2" />
-            <template v-if="modal.login">
+            <template v-if="form.login">
                 <div class="w-4/5 flex-grow-0 mt-4">
                     Don't have an account?
                     <span class="text-bold cursor-pointer underline" @click="reset();
-                    modal.login = false">Sign up</span>
+                    form.login = false">Sign up</span>
                 </div>
             </template>
             <template v-else>
-                <VaInput v-model="modal.password3" label="Repeat Password"
+                <VaInput v-model="form.password3" label="Repeat Password"
                          name="Repeat Password" type="password"
-                         immediate-validation :error="modal.err3 != ''"
-                         :error-messages="modal.err3" @input="matchPwd(modal)"
+                         immediate-validation :error="form.err3 != ''"
+                         :error-messages="form.err3" @input="matchPwd(form)"
                          class="w-4/5 flex-grow-0 mt-2" />
                 <div class="w-4/5 flex-grow-0 mt-4">
                     Already have an account?
                     <span class="text-bold cursor-pointer underline"
-                          @click="reset(); modal.login = true">Log
+                          @click="reset(); form.login = true">Log
                         in</span>
                 </div>
             </template>

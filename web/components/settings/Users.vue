@@ -5,7 +5,7 @@ import { VaButton } from 'vuestic-ui';
 import { logout, validUsr, validPwd, matchPwd } from "@/composables/user";
 const authorize = defineModel<boolean>({ required: true })
 
-const usrModal = reactive({
+const usernameForm = reactive({
     show: false,
     wait: false,
     username1: '',
@@ -17,31 +17,31 @@ function username(): string {
 }
 
 function showUsrModal() {
-    usrModal.show = true;
-    usrModal.username1 = username();
-    usrModal.err1 = '';
+    usernameForm.show = true;
+    usernameForm.username1 = username();
+    usernameForm.err1 = '';
 }
 
 function beforeOkUsr(hide: () => void) {
-    if (usrModal.err1 != '') {
+    if (usernameForm.err1 != '') {
         return;
     }
-    if (usrModal.wait) { return; }
+    if (usernameForm.wait) { return; }
 
-    usrModal.wait = true
+    usernameForm.wait = true
     axios.post('/api/user/update', {
         token: localStorage.getItem('token'),
-        username: usrModal.username1,
+        username: usernameForm.username1,
     }).then(_ => {
         hide();
         logout();
         authorize.value = false;
     }).catch(_ => {
-        usrModal.err1 = 'please try again';
-    }).finally(() => usrModal.wait = false)
+        usernameForm.err1 = 'please try again';
+    }).finally(() => usernameForm.wait = false)
 }
 
-const pwdModal = reactive({
+const passwordForm = reactive({
     show: false,
     wait: false,
     password1: '',
@@ -53,32 +53,32 @@ const pwdModal = reactive({
 })
 
 function showPwdModal() {
-    pwdModal.show = true;
-    pwdModal.password1 = '';
-    pwdModal.password2 = '';
-    pwdModal.password3 = '';
-    pwdModal.err1 = '';
-    pwdModal.err2 = '';
-    pwdModal.err3 = '';
+    passwordForm.show = true;
+    passwordForm.password1 = '';
+    passwordForm.password2 = '';
+    passwordForm.password3 = '';
+    passwordForm.err1 = '';
+    passwordForm.err2 = '';
+    passwordForm.err3 = '';
 }
 
 function beforeOkPwd(hide: () => void) {
-    if (pwdModal.err1 != '' || pwdModal.err2 != '' || pwdModal.err3 != '') {
+    if (passwordForm.err1 != '' || passwordForm.err2 != '' || passwordForm.err3 != '') {
         return;
     }
-    if (pwdModal.wait) { return; }
+    if (passwordForm.wait) { return; }
 
-    pwdModal.wait = true
+    passwordForm.wait = true
     axios.post('/api/user/update', {
         token: localStorage.getItem('token'),
-        password: [pwdModal.password1, pwdModal.password2]
+        password: [passwordForm.password1, passwordForm.password2]
     }).then(_ => {
         hide();
         logout();
         authorize.value = false;
     }).catch(_ => {
-        pwdModal.err1 = 'wrong password';
-    }).finally(() => pwdModal.wait = false)
+        passwordForm.err1 = 'wrong password';
+    }).finally(() => passwordForm.wait = false)
 }
 </script>
 
@@ -101,33 +101,33 @@ function beforeOkPwd(hide: () => void) {
             </div>
         </VaCardContent>
     </VaCard>
-    <VaModal v-model="usrModal.show" ok-text="Save" size="auto"
+    <VaModal v-model="usernameForm.show" ok-text="Save" size="auto"
              :before-ok="beforeOkUsr">
         <div class="w-80 flex flex-col items-center">
-            <VaInput v-model="usrModal.username1" label="New Username"
+            <VaInput v-model="usernameForm.username1" label="New Username"
                      name="New Username" immediate-validation
-                     :error="usrModal.err1 != ''"
-                     :error-messages="usrModal.err1" @input="validUsr(usrModal)"
+                     :error="usernameForm.err1 != ''"
+                     :error-messages="usernameForm.err1" @input="validUsr(usernameForm)"
                      class="w-4/5 flex-grow-0" />
         </div>
     </VaModal>
-    <VaModal v-model="pwdModal.show" ok-text="Save" size="auto"
+    <VaModal v-model="passwordForm.show" ok-text="Save" size="auto"
              :before-ok="beforeOkPwd">
         <div class="w-80 flex flex-col items-center">
-            <VaInput v-model="pwdModal.password1" label="Old Password"
+            <VaInput v-model="passwordForm.password1" label="Old Password"
                      name="Old Password" type="password" immediate-validation
-                     :error="pwdModal.err1 != ''"
-                     :error-messages="pwdModal.err1" @input="pwdModal.err1 = ''"
+                     :error="passwordForm.err1 != ''"
+                     :error-messages="passwordForm.err1" @input="passwordForm.err1 = ''"
                      class="w-4/5 flex-grow-0 mt-2" />
-            <VaInput v-model="pwdModal.password2" label="New Password"
+            <VaInput v-model="passwordForm.password2" label="New Password"
                      name="New Password" type="password" immediate-validation
-                     :error="pwdModal.err2 != ''"
-                     :error-messages="pwdModal.err2" @input="validPwd(pwdModal)"
+                     :error="passwordForm.err2 != ''"
+                     :error-messages="passwordForm.err2" @input="validPwd(passwordForm)"
                      class="w-4/5 flex-grow-0 mt-2" />
-            <VaInput v-model="pwdModal.password3" label="Repeat Password"
+            <VaInput v-model="passwordForm.password3" label="Repeat Password"
                      name="Repeat Password" type="password" immediate-validation
-                     :error="pwdModal.err3 != ''"
-                     :error-messages="pwdModal.err3" @input="matchPwd(pwdModal)"
+                     :error="passwordForm.err3 != ''"
+                     :error-messages="passwordForm.err3" @input="matchPwd(passwordForm)"
                      class="w-4/5 flex-grow-0 mt-2" />
         </div>
     </VaModal>
