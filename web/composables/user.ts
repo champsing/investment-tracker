@@ -29,34 +29,3 @@ export async function duplicateUsername(username: string): Promise<boolean | str
     return !hasUser || 'username already exists'
 }
 
-export function validUsername(username: string, ret: (e: string) => void) {
-    if (username.length < 6) {
-        ret('username too short')
-    } else {
-        axios.post("/api/user/exist", {
-            username: username,
-        }).then(response => {
-            if (response.data) {
-                ret('username already exists')
-            } else {
-                ret('')
-            }
-        })
-    }
-}
-
-export function validPassword(password: string, ret: (e: string) => void) {
-    if (password.length < 8) {
-        ret('password too short')
-    } else {
-        ret('')
-    }
-}
-
-export function matchPassword(p1: string, p2: string, ret: (e: string) => void) {
-    if (p1 != p2) {
-        ret('password does not match')
-    } else {
-        ret('')
-    }
-}
