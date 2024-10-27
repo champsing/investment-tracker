@@ -10,7 +10,7 @@ export function login(data: { token: string, username: string }) {
     localStorage.setItem('username', data.username);
 }
 
-export function userId(): string {
+export function getUserId(): string {
     let token = localStorage.getItem('token')
     if (token == null) {
         return null
@@ -18,35 +18,38 @@ export function userId(): string {
     return JSON.parse(atob(token.split('.')[1]))['iss']
 }
 
-export function validUsername(username: string, error: (e: string) => void) {
+export function getUsername(): string {
+    return localStorage.getItem('username');
+}
+
+export function validUsername(username: string, ret: (e: string) => void) {
     if (username.length < 6) {
-        error('username too short')
+        ret('username too short')
     } else {
         axios.post("/api/user/exist", {
             username: username,
         }).then(response => {
             if (response.data) {
-                error('username already exists')
+                ret('username already exists')
             } else {
-                error('')
+                ret('')
             }
         })
     }
 }
 
-export function validPwd(data: { password2: string, err2: string }) {
-    if (data.password2.length < 8) {
-        data.err2 = 'password too short'
+export function validPassword(password: string, ret: (e: string) => void) {
+    if (password.length < 8) {
+        ret('password too short')
     } else {
-        data.err2 = ''
+        ret('')
     }
 }
 
-export function matchPwd(data: { password2: string, password3: string, err3: string }) {
-    if (data.password2 != data.password3) {
-        data.err3 = 'password does not match'
+export function matchPassword(p1: string, p2: string, ret: (e: string) => void) {
+    if (p1 != p2) {
+        ret('password does not match')
     } else {
-        data.err3 = ''
+        ret('')
     }
 }
-

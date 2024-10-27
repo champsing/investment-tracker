@@ -2,7 +2,10 @@
 import { reactive } from "vue";
 import { VaInput, VaButton, VaModal } from 'vuestic-ui';
 import axios from "axios";
-import { logout, login, validUsername, validPwd, matchPwd } from '@composables/user';
+import {
+    logout, login, validUsername, validPassword, matchPassword,
+    getUsername
+} from '@composables/user';
 
 const authorize = defineModel<boolean>({ required: true })
 
@@ -11,43 +14,54 @@ const form = reactive({
     login: true,
     wait: false,
 
-    username1: '',
-    err1: '',
-    password2: '',
-    err2: '',
-    password3: '',
-    err3: '',
+    username: '',
+    usernameErr: '',
+    password: '',
+    passwordErr: '',
+    repeatPassword: '',
+    repeatPasswordErr: '',
 })
 
-function reset() {
-    form.wait = false;
+function showModal() {
+    form.show = true;
+    form.login = true;
 
-    form.username1 = '';
-    form.password2 = '';
-    form.password3 = '';
-
-    form.err1 = '';
-    form.err2 = '';
-    form.err3 = '';
+    form.username = '';
+    form.usernameErr = '';
+    form.password = '';
+    form.passwordErr = '';
+    form.repeatPassword = '';
+    form.repeatPasswordErr = '';
 }
 
-function showModal() {
-    form.show = true
-    form.login = true
-    reset();
+function switchModal() {
+    form.login = !form.login;
+
+    form.username = '';
+    form.usernameErr = '';
+    form.password = '';
+    form.passwordErr = '';
+    form.repeatPassword = '';
+    form.repeatPasswordErr = '';
 }
 
 function usernameInput() {
     if (!form.login) {
-        validUsername(form.username1, (e) => form.err1 = e)
+        validUsername(form.username, (e) => form.usernameErr = e)
     }
 }
 
-function validPwd2() {
+function passwordInput() {
     if (form.login) {
-        form.err2 = ''
+        form.passwordErr = ''
     } else {
-        validPwd(form);
+        validPassword(form.password, (e) => form.passwordErr = e);
+    }
+}
+
+function repeatPasswordInput() {
+    if (!form.login) {
+        matchPassword(form.password, form.repeatPassword, (e) => form.repeatPasswordErr = e);
     }
 }
 
@@ -60,43 +74,38 @@ function okText() {
 }
 
 function beforeOk(hide: () => void) {
-    if (form.err1 != '' || form.err2 != '' || form.err3 != '') {
+    if (form.usernameErr != '' || form.passwordErr != '' ||
+        form.repeatPasswordErr != '' || form.wait) {
         return;
     }
-
-    if (form.wait) { return; }
 
     form.wait = true
     if (form.login) {
         axios.post("/api/user/login", {
-            username: form.username1,
-            password: form.password2,
+            username: form.username,
+            password: form.password,
         }).then(response => {
             hide();
             login(response.data);
             authorize.value = true;
         }).catch(_ => {
-            form.err2 = "wrong password";
+            form.passwordErr = "wrong password";
             authorize.value = false;
         }).finally(() => {
             form.wait = false;
         })
     } else {
         axios.post("/api/user/register", {
-            username: form.username1,
-            password: form.password2,
+            username: form.username,
+            password: form.password,
         }).then(_ => {
             form.login = true;
         }).catch(_ => {
-            form.err2 = "please try again";
+            form.passwordErr = "please try again";
         }).finally(() => {
             form.wait = false;
         })
     }
-}
-
-function username(): string {
-    return localStorage.getItem('username');
 }
 
 function rotateToken() {
@@ -133,7 +142,7 @@ setInterval(rotateToken, 1000 * 60);
             </template>
             <div class="flex flex-col">
                 <div class="text-sm text-center">
-                    {{ username() }}
+                    {{ getUsername() }}
                 </div>
                 <VaDivider />
                 <VaButton background-opacity="0" color="textPrimary"
@@ -150,31 +159,34 @@ setInterval(rotateToken, 1000 * 60);
     <VaModal v-model="form.show" size="auto" :ok-text="okText()"
              :before-ok="beforeOk">
         <div class="w-80 flex flex-col items-center">
-            <VaInput v-model="form.username1" label="Username" name="Username"
-                     immediate-validation :error="form.err1 != ''"
-                     :error-messages="form.err1" @input="usernameInput()"
+            <VaInput v-model="form.username" label="Username" name="Username"
+                     immediate-validation :error="form.usernameErr != ''"
+                     :error-messages="form.usernameErr" @input="usernameInput()"
                      class="w-4/5 flex-grow-0" />
-            <VaInput v-model="form.password2" label="Password" name="Password"
+            <VaInput v-model="form.password" label="Password" name="Password"
                      type="password" immediate-validation
-                     :error="form.err2 != ''" :error-messages="form.err2"
-                     @input="validPwd2()" class="w-4/5 flex-grow-0 mt-2" />
+                     :error="form.passwordErr != ''"
+                     :error-messages="form.passwordErr" @input="passwordInput()"
+                     class="w-4/5 flex-grow-0 mt-2" />
             <template v-if="form.login">
                 <div class="w-4/5 flex-grow-0 mt-4">
                     Don't have an account?
-                    <span class="text-bold cursor-pointer underline" @click="reset();
-                    form.login = false">Sign up</span>
+                    <span class="text-bold cursor-pointer underline"
+                          @click="switchModal()">Sign up</span>
                 </div>
             </template>
             <template v-else>
-                <VaInput v-model="form.password3" label="Repeat Password"
+                <VaInput v-model="form.repeatPassword" label="Repeat Password"
                          name="Repeat Password" type="password"
-                         immediate-validation :error="form.err3 != ''"
-                         :error-messages="form.err3" @input="matchPwd(form)"
+                         immediate-validation
+                         :error="form.repeatPasswordErr != ''"
+                         :error-messages="form.repeatPasswordErr"
+                         @input="repeatPasswordInput()"
                          class="w-4/5 flex-grow-0 mt-2" />
                 <div class="w-4/5 flex-grow-0 mt-4">
                     Already have an account?
                     <span class="text-bold cursor-pointer underline"
-                          @click="reset(); form.login = true">Log
+                          @click="switchModal()">Log
                         in</span>
                 </div>
             </template>

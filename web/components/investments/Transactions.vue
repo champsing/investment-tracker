@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref } from "vue"
 import { VaCard, VaButton, VaDataTable } from 'vuestic-ui';
-import { userId } from "@/composables/user";
+import { getUserId } from "@/composables/user";
 
 let edit_mode = ref(true)
 
@@ -93,7 +93,7 @@ const actionOptions = [
     <VaCard>
         <VaCardTitle>
             Transactions
-            <template v-if="userId() == 'Editor'">
+            <template v-if="getUserId() == 'Editor'">
                 <VaButton preset="plain" icon="edit" size="small" @click="edit_mode = !edit_mode" class="ml-3" />
             </template>
         </VaCardTitle>
