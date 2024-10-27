@@ -16,14 +16,14 @@ async function beforeOk(hide: () => void) {
     await validateAsync();
     if (isLoading.value || !isValid.value) { return; }
 
-    axios.post('/api/user/update', {
+    await axios.post('/api/user/update', {
         token: localStorage.getItem('token'),
         username: form.username,
-    }).then(_ => {
-        hide();
-        logout();
-        authorize.value = false;
-    })
+    });
+
+    hide();
+    logout();
+    authorize.value = false;
 }
 
 </script>

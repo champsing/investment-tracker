@@ -1,110 +1,49 @@
 <script setup lang="ts">
 import { reactive } from "vue";
-import { VaInput, VaButton, VaModal } from 'vuestic-ui';
+import { useForm } from 'vuestic-ui';
 import axios from "axios";
-import {
-    logout, login, validUsername, validPassword, matchPassword,
-    getUsername
-} from '@composables/user';
+import { logout, login, getUsername, duplicateUsername } from '@composables/user';
 
 const authorize = defineModel<boolean>({ required: true })
+const { isLoading, isValid, validateAsync, reset } = useForm('formRef')
 
-const form = reactive({
+const modal = reactive({
     show: false,
     login: true,
-    wait: false,
+});
 
+const form = reactive({
     username: '',
-    usernameErr: '',
     password: '',
-    passwordErr: '',
-    repeatPassword: '',
-    repeatPasswordErr: '',
+    password2: '',
+    status200: true,
 })
 
-function showModal() {
-    form.show = true;
-    form.login = true;
+async function beforeOk(hide: () => void) {
+    await validateAsync();
+    if (isLoading.value || !isValid.value) { return; }
 
-    form.username = '';
-    form.usernameErr = '';
-    form.password = '';
-    form.passwordErr = '';
-    form.repeatPassword = '';
-    form.repeatPasswordErr = '';
-}
-
-function switchModal() {
-    form.login = !form.login;
-
-    form.username = '';
-    form.usernameErr = '';
-    form.password = '';
-    form.passwordErr = '';
-    form.repeatPassword = '';
-    form.repeatPasswordErr = '';
-}
-
-function usernameInput() {
-    if (!form.login) {
-        validUsername(form.username, (e) => form.usernameErr = e)
-    }
-}
-
-function passwordInput() {
-    if (form.login) {
-        form.passwordErr = ''
-    } else {
-        validPassword(form.password, (e) => form.passwordErr = e);
-    }
-}
-
-function repeatPasswordInput() {
-    if (!form.login) {
-        matchPassword(form.password, form.repeatPassword, (e) => form.repeatPasswordErr = e);
-    }
-}
-
-function okText() {
-    if (form.login) {
-        return "Login"
-    } else {
-        return "Signup"
-    }
-}
-
-function beforeOk(hide: () => void) {
-    if (form.usernameErr != '' || form.passwordErr != '' ||
-        form.repeatPasswordErr != '' || form.wait) {
-        return;
-    }
-
-    form.wait = true
-    if (form.login) {
-        axios.post("/api/user/login", {
-            username: form.username,
-            password: form.password,
-        }).then(response => {
+    if (modal.login) {
+        try {
+            let response = await axios.post("/api/user/login", {
+                username: form.username,
+                password: form.password,
+            });
             hide();
             login(response.data);
             authorize.value = true;
-        }).catch(_ => {
-            form.passwordErr = "wrong password";
+        } catch {
+            form.status200 = false;
+            await validateAsync();
+            form.status200 = true;
             authorize.value = false;
-        }).finally(() => {
-            form.wait = false;
-        })
+        }
     } else {
-        axios.post("/api/user/register", {
+        await axios.post("/api/user/register", {
             username: form.username,
             password: form.password,
-        }).then(_ => {
-            form.login = true;
-        }).catch(_ => {
-            form.passwordErr = "please try again";
-        }).finally(() => {
-            form.wait = false;
-        })
+        });
+        modal.login = true;
     }
 }
 
@@ -131,7 +70,8 @@ setInterval(rotateToken, 1000 * 60);
 <template>
     <template v-if="!authorize">
         <VaButton icon="ms-login" background-opacity="0" color="textPrimary"
-                  @click="showModal()" class="login-button" />
+                  @click="modal.show = true; modal.login = true"
+                  class="login-button" />
     </template>
     <template v-else>
         <VaButtonDropdown background-opacity="0" color="textPrimary" hide-icon
@@ -156,41 +96,44 @@ setInterval(rotateToken, 1000 * 60);
             </div>
         </VaButtonDropdown>
     </template>
-    <VaModal v-model="form.show" size="auto" :ok-text="okText()"
+    <VaModal v-model="modal.show" size="auto"
+             :ok-text="modal.login ? 'Login' : 'Signup'" @open="reset"
              :before-ok="beforeOk">
-        <div class="w-80 flex flex-col items-center">
-            <VaInput v-model="form.username" label="Username" name="Username"
-                     immediate-validation :error="form.usernameErr != ''"
-                     :error-messages="form.usernameErr" @input="usernameInput()"
-                     class="w-4/5 flex-grow-0" />
-            <VaInput v-model="form.password" label="Password" name="Password"
-                     type="password" immediate-validation
-                     :error="form.passwordErr != ''"
-                     :error-messages="form.passwordErr" @input="passwordInput()"
-                     class="w-4/5 flex-grow-0 mt-2" />
-            <template v-if="form.login">
+        <VaForm ref="formRef" class="w-80 flex flex-col items-center">
+            <template v-if="modal.login">
+                <VaInput v-model="form.username" label="Username"
+                         class="w-4/5 flex-grow-0" />
+                <VaInput v-model="form.password" label="Password"
+                         type="password"
+                         :rules="[(_) => form.status200 || 'incorrect password']"
+                         class="w-4/5 flex-grow-0 mt-2" />
                 <div class="w-4/5 flex-grow-0 mt-4">
                     Don't have an account?
                     <span class="text-bold cursor-pointer underline"
-                          @click="switchModal()">Sign up</span>
+                          @click="modal.login = false; reset()">Sign up</span>
                 </div>
             </template>
             <template v-else>
-                <VaInput v-model="form.repeatPassword" label="Repeat Password"
-                         name="Repeat Password" type="password"
-                         immediate-validation
-                         :error="form.repeatPasswordErr != ''"
-                         :error-messages="form.repeatPasswordErr"
-                         @input="repeatPasswordInput()"
+                <VaInput v-model="form.username" label="Username" :rules="[
+                    ((x) => x.length >= 6 || 'username too short'),
+                    duplicateUsername
+                ]" class="w-4/5 flex-grow-0" />
+                <VaInput v-model="form.password" label="Password"
+                         type="password"
+                         :rules="[(x) => x.length >= 8 || 'password too short']"
+                         class="w-4/5 flex-grow-0 mt-2" />
+                <VaInput v-model="form.password2" label="Repeat Password"
+                         type="password"
+                         :rules="[(x) => x == form.password || 'password does not match']"
                          class="w-4/5 flex-grow-0 mt-2" />
                 <div class="w-4/5 flex-grow-0 mt-4">
                     Already have an account?
                     <span class="text-bold cursor-pointer underline"
-                          @click="switchModal()">Log
+                          @click="modal.login = true; reset()">Log
                         in</span>
                 </div>
             </template>
-        </div>
+        </VaForm>
     </VaModal>
 </template>
 

@@ -5,7 +5,7 @@ import { useForm } from 'vuestic-ui';
 import { logout } from "@/composables/user";
 
 const authorize = defineModel<boolean>({ required: true })
-const { isLoading, isValid, reset, validate } = useForm('formRef')
+const { isLoading, isValid, reset, validateAsync } = useForm('formRef')
 
 const modal = ref(false);
 const form = reactive({
@@ -16,20 +16,23 @@ const form = reactive({
 })
 
 async function beforeOk(hide: () => void) {
-    validate();
+    await validateAsync();
     if (isLoading.value || !isValid.value) { return; }
 
-    axios.post('/api/user/update', {
-        token: localStorage.getItem('token'),
-        password: [form.oldPassword, form.newPassword]
-    }).then(_ => {
+    try {
+        await axios.post('/api/user/update', {
+            token: localStorage.getItem('token'),
+            password: [form.oldPassword, form.newPassword]
+        });
+
         hide();
         logout();
         authorize.value = false;
-    }).catch(_ => {
+    } catch {
         form.status200 = false;
-        validate();
-    })
+        await validateAsync();
+        form.status200 = true;
+    }
 }
 </script>
 
@@ -41,7 +44,7 @@ async function beforeOk(hide: () => void) {
                  :before-ok="beforeOk">
             <VaForm ref="formRef" class="w-80 flex flex-col items-center">
                 <VaInput v-model="form.oldPassword" label="Old Password"
-                         type="password" @input="(_) => form.status200 = true"
+                         type="password"
                          :rules="[(_) => form.status200 || 'incorrect password']"
                          class="w-4/5 flex-grow-0 mt-2" />
                 <VaInput v-model="form.newPassword" label="New Password"
