@@ -16,9 +16,9 @@
 ### Transactions
 
 - [ ] Deposit / Withdrawal
-- [ ] Fee / Reimbursement
 - [ ] Buy / Sell
 - [ ] Interest / Dividend
+- [ ] Fee / Reimbursement
 - [ ] ForEx
 - [ ] Journal
 - [ ] Split

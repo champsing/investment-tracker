@@ -46,7 +46,7 @@ fetch();
                 </div>
             </VaCardContent>
         </VaCard>
-        <NewAccount />
+        <NewAccount @insert="() => fetch()" />
     </div>
 </template>
 
