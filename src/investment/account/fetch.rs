@@ -22,6 +22,6 @@ pub async fn handler(
         Some(i) => i
     };
 
-    let accounts = database::accounts::select_by_user(user_id)?;
+    let accounts = database::account::select_by_user(user_id)?;
     Ok(HttpResponse::Ok().json(accounts))
 }

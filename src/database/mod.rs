@@ -1,5 +1,6 @@
-pub mod accounts;
-pub mod users;
+pub mod account;
+pub mod user;
+pub mod transaction;
 mod migration;
 
 use crate::error::ServerError;

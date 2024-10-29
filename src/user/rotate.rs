@@ -29,7 +29,7 @@ pub async fn handler(
         None => return Ok(HttpResponse::Forbidden().finish()),
         Some(i) => i
     };
-    let user = match database::users::select(Some(id), None)? {
+    let user = match database::user::select(Some(id), None)? {
         None => return Ok(HttpResponse::BadRequest().finish()),
         Some(u) => u
     };

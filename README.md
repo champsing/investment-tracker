@@ -8,7 +8,6 @@
 
 ### Accounts
 
-- [ ] insert
 - [ ] update name, alias, or kind
 - [ ] delete
 - [ ] show

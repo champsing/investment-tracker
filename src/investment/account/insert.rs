@@ -1,5 +1,5 @@
 use crate::database;
-use crate::database::accounts::Account;
+use crate::database::account::Account;
 use crate::error::ServerError;
 use crate::user::authenticate;
 use actix_web::{post, web, HttpResponse, Responder};
@@ -36,6 +36,6 @@ pub async fn handler(
         return Ok(HttpResponse::BadRequest().body("account alias too short"));
     }
 
-    database::accounts::insert(request.account.clone())?;
+    database::account::insert(request.account.clone())?;
     Ok(HttpResponse::Ok().finish())
 }

@@ -1,19 +1,17 @@
-mod actions;
-mod database;
+mod action;
 
-use super::IPortfolio;
-use actions::Action;
+pub use action::TxnAction;
 use chrono::NaiveDate;
-use rust_decimal::Decimal;
+use sea_query::enum_def;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[enum_def]
 pub struct Transaction {
     #[serde(default)]
     id: Uuid,
     date: NaiveDate,
     account: String,
-    action: Action,
-    fee: (String, Decimal),
+    action: TxnAction,
 }
