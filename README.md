@@ -2,15 +2,11 @@
 
 ## TODO
 
-### Users
-
-- [ ] delete user
-
-### Accounts
-
-- [ ] update name, alias, or kind
-- [ ] delete
-- [ ] show
+- [ ] add hover effect on account card
+- [ ] complete the overall design of Details page, with back, edit account,
+delete account, and info displays
+- [ ] can insert transactions
+- [ ] can export & import transactions of an account
 
 ### Transactions
 

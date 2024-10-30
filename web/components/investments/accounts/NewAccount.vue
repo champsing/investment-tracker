@@ -11,6 +11,7 @@ const emits = defineEmits<{
 
 const { isLoading, isValid, reset, validateAsync } = useForm('formRef')
 
+const hover = ref(false);
 const modal = ref(false);
 const form: Account = reactive({
     id: "00000000-0000-0000-0000-000000000000",
@@ -39,10 +40,12 @@ async function beforeOk(hide: () => void) {
 
 <template>
     <div>
-        <VaCard class="h-36 flex items-center justify-center"
-                @click="modal = true">
-            <VaIcon name="ms-add" size="64px" class="flex-grow-0" />
-        </VaCard>
+        <VaHover v-model="hover" class="h-36">
+            <VaCard :gradient="hover" @click="modal = true"
+                    class="h-full flex items-center justify-center">
+                <VaIcon name="ms-add" size="64px" class="flex-grow-0" />
+            </VaCard>
+        </VaHover>
         <VaModal v-model="modal" ok-text="Save" size="auto" @open="reset"
                  :before-ok="beforeOk">
             <VaForm ref="formRef" class="w-80 flex flex-col items-center">

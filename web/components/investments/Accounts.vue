@@ -2,11 +2,11 @@
 import axios from 'axios';
 import { ref } from 'vue';
 import { Account } from '@/composables/account';
+import AccountCard from './accounts/AccountCard.vue';
 import NewAccount from './accounts/NewAccount.vue';
+const emits = defineEmits<{ select: [value: Account] }>()
 
 const accounts = ref<Account[]>([]);
-
-// const
 
 function fetch() {
     axios.post('/api/investment/account/fetch', {
@@ -20,32 +20,27 @@ fetch();
 </script>
 
 <template>
-    <div class="px-4 mt-4 grid grid-cols-4 gap-4">
-        <VaCard v-for="account in accounts" class="h-36">
+    <div class="px-4 mt-4 flex gap-4">
+        <VaCard class="h-72">
             <VaCardTitle>
-                <div class="-mt-2 -mb-2 h-7 flex items-center">
-                    <VaChip size="small" class="text-xs flex-shrink-0">
-                        {{ account.kind }}
-                    </VaChip>
-                    <div class="ml-2 text-xs flex-shrink-0">
-                        {{ account.alias }}
-                    </div>
-                    <div v-if="account.alias != account.name"
-                         class="ml-2 text-xs font-normal text-ellipsis truncate">
-                        ({{ account.name }})
-                    </div>
-                </div>
+                Performance
             </VaCardTitle>
-            <VaCardContent>
-                <div class="flex items-center justify-between">
-                    <div class="text-xl flex-grow-0">CAD 2,000,000</div>
-                    <div class="flex-grow-0 flex flex-col items-end">
-                        <div>+1,000.11 (+2.34%)</div>
-                        <div>+14,000.11 (+11.34%)</div>
-                    </div>
-                </div>
-            </VaCardContent>
         </VaCard>
+        <VaCard class="h-72 w-60 flex-grow-0">
+            <VaCardTitle>
+                Composition
+            </VaCardTitle>
+        </VaCard>
+        <VaCard class="h-72 w-60 flex-grow-0">
+            <VaCardTitle>
+                Contribution Room
+            </VaCardTitle>
+        </VaCard>
+    </div>
+    <div class="px-4 mt-4 grid grid-cols-4 gap-4">
+        <template v-for="account in accounts">
+            <AccountCard :account="account" @click="emits('select', account)" />
+        </template>
         <NewAccount @insert="() => fetch()" />
     </div>
 </template>
