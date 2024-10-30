@@ -37,7 +37,7 @@ fetch();
             </VaCardTitle>
         </VaCard>
     </div>
-    <div class="px-4 !mt-4 grid grid-cols-4 gap-4">
+    <div class="px-4 !mt-4 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
         <template v-for="account in accounts">
             <AccountCard :account="account" @click="emits('select', account)" />
         </template>
