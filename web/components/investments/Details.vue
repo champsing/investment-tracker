@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Account } from '@/composables/account';
+import EditAccount from './details/EditAccount.vue';
 
 const emits = defineEmits<{ back: [] }>()
 const props = defineProps<{ account: Account }>()
@@ -16,11 +17,14 @@ console.log(emits)
             props.account.kind }}</VaChip>
         <div class="flex-grow-0 flex-shrink-0 text-xl ml-4 font-bold">{{
             props.account.alias
-        }}</div>
-        <div class="flex-grow flex-shrink text-xl min-w-0 truncate ml-2">
+            }}</div>
+        <div v-if="props.account.alias != props.account.name"
+             class="flex-grow flex-shrink text-xl min-w-0 truncate ml-2">
             ({{ props.account.name
             }})</div>
-        <VaButton icon="edit" class="flex-grow-0 flex-shrink-0 ml-2" />
+        <VaSpacer v-else />
+        <EditAccount v-model="props.account" />
+        <!-- <VaButton icon="edit" class="flex-grow-0 flex-shrink-0 ml-2" /> -->
         <VaButton icon="delete" class="flex-grow-0 flex-shrink-0 ml-2" />
     </div>
 </template>
