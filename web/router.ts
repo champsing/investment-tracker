@@ -1,7 +1,7 @@
 import { createWebHistory, createRouter } from "vue-router";
 import Overview from "./components/Overview.vue";
 import Settings from "./components/Settings.vue";
-import Investments from "./components/Investments.vue";
+import Investments from "./components/Investment.vue";
 
 const routes = [
     { path: "/", component: Overview },

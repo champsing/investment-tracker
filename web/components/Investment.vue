@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { Account } from '@/composables/account';
 import { Ref, ref } from 'vue';
-import Details from './investments/Details.vue';
-import Accounts from './investments/Accounts.vue';
+import Details from './investment/Details.vue';
+import Accounts from './investment/Accounts.vue';
 
 const account: Ref<Account> = ref(null)
 </script>
