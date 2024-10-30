@@ -20,6 +20,6 @@ const authorize = defineModel<boolean>({ required: true })
 .setting-item {
     @apply inline-block;
     @apply w-full;
-    @apply mt-4;
+    @apply !mt-4;
 }
 </style>

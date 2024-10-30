@@ -9,7 +9,7 @@ const hover = ref(false);
 
 <template>
     <VaHover v-model="hover" class="h-36">
-        <VaCard @click="emits('click')" :gradient="hover" class="h-full">
+        <VaCard :gradient="hover" @click="emits('click')" class="h-full">
             <VaCardTitle>
                 <div class="-mt-2 -mb-2 h-7 flex items-center">
                     <VaChip size="small" square readonly
