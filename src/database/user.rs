@@ -65,13 +65,24 @@ pub fn update(user: User) -> Result<(), ServerError> {
 }
 
 pub fn delete(id: Uuid) -> Result<(), ServerError> {
-    let (query, values) = Query::delete()
+    // TODO: remove transaction related to user.
+
+    use super::account::AccountIden;
+    let (query1, values1) = Query::delete()
+        .from_table(AccountIden::Table)
+        .and_where(Expr::col(AccountIden::Owner).eq(id))
+        .build_rusqlite(SqliteQueryBuilder);
+
+    let (query2, values2) = Query::delete()
         .from_table(UserIden::Table)
         .and_where(Expr::col(UserIden::Id).eq(id))
         .build_rusqlite(SqliteQueryBuilder);
 
-    let connection = Connection::open(DATABASE)?;
-    connection.execute(&query, &*values.as_params())?;
+    let mut connection = Connection::open(DATABASE)?;
+    let transaction = connection.transaction()?;
+    transaction.execute(&query1, &*values1.as_params())?;
+    transaction.execute(&query2, &*values2.as_params())?;
+    transaction.commit()?;
     Ok(())
 }
 
