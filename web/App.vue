@@ -30,8 +30,8 @@ const authorize = ref(false);
                 </VaNavbarItem>
                 <VaNavbarItem>
                     <VaButton icon="ms-monitoring" background-opacity="0"
-                              color="textPrimary" to="/investments">
-                        Investments
+                              color="textPrimary" to="/investment">
+                        Investment
                     </VaButton>
                 </VaNavbarItem>
             </template>
