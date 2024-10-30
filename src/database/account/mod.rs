@@ -92,36 +92,6 @@ pub fn delete(id: Uuid) -> Result<(), ServerError> {
     Ok(())
 }
 
-pub fn select_by_user(user_id: Uuid) -> Result<Vec<Account>, ServerError> {
-    let (query, values) = Query::select()
-        .columns([
-            AccountIden::Id,
-            AccountIden::Name,
-            AccountIden::Alias,
-            AccountIden::Owner,
-            AccountIden::Kind,
-        ])
-        .from(AccountIden::Table)
-        .and_where(Expr::col(AccountIden::Owner).eq(user_id))
-        .build_rusqlite(SqliteQueryBuilder);
-
-    let connection = Connection::open(DATABASE)?;
-    let mut statement = connection.prepare(&query)?;
-    let record: Result<Vec<_>, rusqlite::Error> = statement
-        .query_and_then(&*values.as_params(), |row| {
-            Ok(Account {
-                id: row.get(0)?,
-                name: row.get(1)?,
-                alias: row.get(2)?,
-                owner: row.get(3)?,
-                kind: row.get(4)?,
-            })
-        })?
-        .collect();
-
-    Ok(record?)
-}
-
 pub fn select(id: Uuid) -> Result<Option<Account>, ServerError> {
     let (query, values) = Query::select()
         .columns([
@@ -150,4 +120,34 @@ pub fn select(id: Uuid) -> Result<Option<Account>, ServerError> {
         .next();
 
     Ok(record.transpose()?)
+}
+
+pub fn select_by_user(user_id: Uuid) -> Result<Vec<Account>, ServerError> {
+    let (query, values) = Query::select()
+        .columns([
+            AccountIden::Id,
+            AccountIden::Name,
+            AccountIden::Alias,
+            AccountIden::Owner,
+            AccountIden::Kind,
+        ])
+        .from(AccountIden::Table)
+        .and_where(Expr::col(AccountIden::Owner).eq(user_id))
+        .build_rusqlite(SqliteQueryBuilder);
+
+    let connection = Connection::open(DATABASE)?;
+    let mut statement = connection.prepare(&query)?;
+    let record: Result<Vec<_>, rusqlite::Error> = statement
+        .query_and_then(&*values.as_params(), |row| {
+            Ok(Account {
+                id: row.get(0)?,
+                name: row.get(1)?,
+                alias: row.get(2)?,
+                owner: row.get(3)?,
+                kind: row.get(4)?,
+            })
+        })?
+        .collect();
+
+    Ok(record?)
 }
