@@ -12,14 +12,15 @@ const hover = ref(false);
         <VaCard @click="emits('click')" :gradient="hover" class="h-full">
             <VaCardTitle>
                 <div class="-mt-2 -mb-2 h-7 flex items-center">
-                    <VaChip size="small" class="text-xs flex-shrink-0">
+                    <VaChip size="small" square readonly
+                            class="text-xs flex-grow-0 flex-shrink-0">
                         {{ props.account.kind }}
                     </VaChip>
-                    <div class="ml-2 text-xs flex-shrink-0">
+                    <div class="ml-2 text-xs flex-grow-0 flex-shrink-0">
                         {{ props.account.alias }}
                     </div>
                     <div v-if="props.account.alias != props.account.name"
-                         class="ml-2 text-xs font-normal text-ellipsis truncate">
+                         class="ml-2 text-xs font-normal min-w-0 truncate flex-grow flex-shrink">
                         ({{ props.account.name }})
                     </div>
                 </div>

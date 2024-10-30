@@ -20,7 +20,7 @@ fetch();
 </script>
 
 <template>
-    <div class="px-4 mt-4 flex gap-4">
+    <div class="px-4 mt-2 flex gap-4">
         <VaCard class="h-72">
             <VaCardTitle>
                 Performance
