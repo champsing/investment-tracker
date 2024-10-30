@@ -1,5 +1,6 @@
 mod database;
 mod error;
+mod repository;
 pub mod investment;
 pub mod user;
 

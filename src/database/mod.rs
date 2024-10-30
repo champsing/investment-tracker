@@ -1,6 +1,7 @@
 pub mod account;
 pub mod user;
 pub mod transaction;
+pub mod asset;
 mod migration;
 
 use crate::error::ServerError;

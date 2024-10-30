@@ -1,9 +1,10 @@
+use crate::database::asset::Asset;
 use core::str;
 use rusqlite::types::{FromSql, FromSqlError, ValueRef};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
-type Value = (Decimal, String);
+type Value = (Decimal, Asset);
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type")]
