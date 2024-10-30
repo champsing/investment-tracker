@@ -2,7 +2,6 @@
 
 ## TODO
 
-- [ ] add hover effect on account card
 - [ ] complete the overall design of Details page, with back, edit account,
 delete account, and info displays
 - [ ] can insert transactions
