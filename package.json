@@ -11,6 +11,7 @@
     "dependencies": {
         "@vuestic/tailwind": "^0.1.5",
         "axios": "^1.7.7",
+        "investment-tracker": "file:",
         "vue": "^3.4.15",
         "vue-router": "^4.4.5",
         "vuestic-ui": "^1.10.0"
